@@ -1,4 +1,4 @@
-#include-once
+﻿#include-once
 #include "Common.au3"
 
 ;setSetting()
@@ -25,16 +25,16 @@ Func AscendingHeightsPlay()
 	Local $bSame = False
 
 	Local $iLastCheckTime = TimerInit()
-	Local $iStartTime = TimerInit() ; Timer for 4-minute timeout
+	Local $iStartTime = TimerInit() ; 4분 제한 시간용 타이머
 	
 	While True
-		; Check for 4-minute timeout 
+		; 4분 제한 시간 확인 
 		If TimerDiff($iStartTime) >= 240000 Then
 			WriteInLogs("Ascending Heights timed out after 4 minutes")
-			; Press 'a' for 3 seconds
+			; 'a' 키를 3초 누른다
 			cSend(3000, 0, "a")
 			Sleep(100)
-			; Press 'd' for 3 seconds
+			; 'd' 키를 3초 누른다
 			cSend(3000, 0, "d")
 			ExitLoop
 		EndIf
@@ -111,10 +111,10 @@ Func searchAllPlatformBellowPlayer($iPlayerX, $iPlayerY, $bSame)
 	EndIf
 
 	If Not @error Then
-		Local $iLoopCounter = 0 ; Safety counter to prevent infinite loops
+		Local $iLoopCounter = 0 ; 무한 반복을 막기 위한 안전 장치
 		While True
 			$iLoopCounter += 1
-			If $iLoopCounter > 1000 Then Return False ; Exit if too many iterations
+			If $iLoopCounter > 1000 Then Return False ; 너무 많이 돌면 빠져나간다
 			
 			PixelSearch($aPosPlatform[0] + 6, $aPosPlatform[1], $aPosPlatform[0] + 6, $aPosPlatform[1], 0x8B9BB4)
 			If @error Then Return $aPosPlatform

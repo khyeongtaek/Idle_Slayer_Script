@@ -1,15 +1,15 @@
-#include-once
+﻿#include-once
 #include <File.au3>
 #include <WinAPISys.au3>
 
 Func setSetting()
-	; Enables GUI events
+	; GUI 이벤트 모드를 켠다
 	Opt("GUIOnEventMode", 1)
-	; Disable Caps for better background
+	; 배경 입력이 잘 먹도록 Caps Lock 자동 처리를 끈다
 	Opt("SendCapslockMode", 0)
-	; Set window Mode for PixelSearch
+	; PixelSearch 좌표를 활성 창의 클라이언트 영역 기준으로 맞춘다
 	Opt("PixelCoordMode", 0)
-	; Set window Mode for MouseClick
+	; MouseClick 좌표를 활성 창의 클라이언트 영역 기준으로 맞춘다
 	Opt("MouseCoordMode", 0)
 	_WinAPI_SetKeyboardLayout("Idle Slayer", 0x0409)
 EndFunc   ;==>setSetting
@@ -41,7 +41,7 @@ EndFunc   ;==>FindPixelUntilFound
 
 
 Func Slider()
-	;Top left
+	;왼쪽 위
 	PixelSearch(441, 560, 443, 560, 0x007E00)
 	If Not @error Then
 		MouseMove(840, 560, 0)
@@ -49,7 +49,7 @@ Func Slider()
 		Return
 	EndIf
 
-	;Bottom left
+	;왼쪽 아래
 	PixelSearch(441, 620, 443, 620, 0x007E00)
 	If Not @error Then
 		MouseMove(840, 620, 0)
@@ -57,7 +57,7 @@ Func Slider()
 		Return
 	EndIf
 
-	;Top right
+	;오른쪽 위
 	PixelSearch(847, 560, 850, 560, 0x007E00)
 	If Not @error Then
 		MouseMove(450, 560, 0)
@@ -65,7 +65,7 @@ Func Slider()
 		Return
 	EndIf
 
-	;Bottom right
+	;오른쪽 아래
 	PixelSearch(847, 620, 850, 620, 0x007E00)
 	If Not @error Then
 		MouseMove(450, 620, 0)

@@ -1,90 +1,135 @@
-# How to make it run?
+# Idle Slayer 매크로 (한글판)
 
-(Works only with the Steam Version on Windows)
+[Devil4ngle/Idle_Slayer_Script](https://github.com/Devil4ngle/Idle_Slayer_Script) 를 한글로 옮기고 몇 가지 기능을 덧붙인 버전입니다.
 
-You have two options:
+**게임 자체는 영어로 두고 써야 합니다.** 이 매크로는 화면의 특정 위치 색을 읽어서 상황을 판단하기 때문에, 게임 언어를 바꾸면 글자 위치가 달라져서 동작하지 않습니다. 한글로 바꾼 것은 매크로 프로그램의 화면과 설명뿐입니다.
 
-1) **Run with _.exe files** (easy):
+(Steam 판 · Windows 에서만 동작합니다)
 
-   - Go to [Github Releases](https://github.com/Devil4ngle/Idle_Slayer_Script/releases)
-   - Download `Idle Runner_x64.exe` or `Idle Runner_x32.exe` depending on your [System](https://support.microsoft.com/en-us/windows/32-bit-and-64-bit-windows-frequently-asked-questions-c6ca9541-8dce-4d48-0415-94a3faa2e13d).
-   - Run `Idle Runner_x64.exe` / `Idle Runner_x32.exe`
-   
-   ![image](https://github.com/Devil4ngle/Idle_Slayer_Script/assets/101042789/a6224058-0f4b-435e-bca0-45730f9b3dd4)
-
-
-
-2) **Run with source code** (harder):
-
-    If you do not trust the exe files or your antivirus won't let you run it then you can do the following:
-   
-    - Download the [Source Code](https://github.com/Devil4ngle/Idle_Slayer_Script/releases) and ***unzip*** it.
-    
-    - Download and install [AutoIt Full Installation AND AutoIt Script Editor](https://www.autoitscript.com/site/autoit/downloads/). ( You need to install both )
-   
-   ![image](https://github.com/Devil4ngle/Idle_Slayer_Script/assets/101042789/df50f05b-530e-4777-bfd3-5012adf77baf)
-
-    - Right-click the file `Idle Runner.au3` and click `Compile with Options`
-
-    ![image](https://github.com/Devil4ngle/Idle_Slayer_Script/assets/101042789/5dc44eb5-aa9a-435f-82fb-710526cc4795)
-   
-    - In the menu click `Compile Script`.
-      
-   It will generate exe files which should run without issue.
-
-# Settings
-
-- ### Mandatory Settings:
-
-    - Resolution of the game needs to be ***1280x720*** and Windowed and display resolution to 100%.
-      
-    - The game must be in ***English***.
- 
-    - Game needs to be in ***focus***, if not it will only jump.
- 
-    - Disable custom cursor.
-
-    - Set keybinds: jump to up arrow, boost to right arrow.
-
-      
-- ### Optional Settings:
-
-    - ***Bonus stage 2/3*** will only be completed check Skip Bonus Stage otherwise.
-
-    - Ascension Upgrade ***Protect***  is needed to complete Bonus Stage 2/3.
-
-    - Do NOT buy the ***Vertical Magnet***.
-
-    - Disable ***dialogue for Portal*** in setting.
-
-    - Enable ***rounded bulk*** in setting.
-
-    - Enable ***hide locked quest rewards*** in setting.
-
-    - Ascension Upgrade ***Leadership Master*** is needed for claiming minions otherwise it will not claim them.
-  
-    - Use Anna Default-Skin for Ascending Heights
-
-    ### For Bossfights only:
-
-   -  Use Anna Default-Skin.
-
-   - Use Bat Long bow or a Multishot Bow.
-
-   - It only works after you beat him in the story mode
-  
-# Join the Idle Slayer Scripting Discord Community!
-
-For additional assistance or to connect with a community, join the [Idle Slayer Scripting Discord Server](https://discord.gg/aEaBr77UDn)
-
-# What can it do?
-
-Everything the game offers with Human Performance if not better. Here is a showcase.
-[![Watch the video](https://img.youtube.com/vi/uDY0wCMQZX8/hqdefault.jpg)](https://www.youtube.com/watch?v=uDY0wCMQZX8)
-
-[![Watch the video](https://img.youtube.com/vi/8fPHeHPHHlo/hqdefault.jpg)](https://www.youtube.com/watch?v=8fPHeHPHHlo)
-
-[![Watch the video](https://img.youtube.com/vi/ummuxK_9-ck/hqdefault.jpg)](https://www.youtube.com/watch?v=ummuxK_9-ck)
 ---
 
-Buy Me a [Coffee](https://www.buymeacoffee.com/devil4ngle) :coffee: 
+## 한글판에서 추가된 기능
+
+### 1. 미니언 관련 설정
+
+승천 업그레이드 **리더십 마스터**가 있어야 [모두 받기] / [모두 보내기] 버튼이 생겨서 미니언 처리가 한 번에 끝납니다. 이 업그레이드가 없는 경우를 위해 옵션 두 개를 추가했습니다.
+
+[일반] 탭에 있습니다.
+
+| 옵션 | 설명 |
+| --- | --- |
+| **미니언 자동 수집** (기본 켜짐) | 끄면 미니언 관련 동작을 아예 하지 않습니다. 아래 방식이 잘 안 되면 이걸 끄세요. |
+| **리더십 마스터 없음 (개별 수집)** (기본 꺼짐) | [모두 보내기] 버튼이 안 보일 때 켜세요. 미니언 목록의 버튼을 위에서부터 하나씩 눌러 보상을 받고 다시 임무에 보냅니다. |
+
+> ### ⚠️ "리더십 마스터 없음" 은 아직 검증되지 않았습니다
+>
+> 이 방식의 **탐색 좌표 범위와 반복 횟수는 실제 게임 화면을 보고 정한 값이 아니라 추측입니다.**
+> 찾는 초록색(`0x11AA23` / `0x11A622`)도 미니언 전용이 아니라 게임 전반의 "구매 / 수령 가능" 색이라,
+> 장비 구매·업그레이드 구매·퀘스트 보상 버튼에도 같은 색이 쓰입니다.
+>
+> 따라서 탭 이동이 어긋나 **승천 트리 화면에 머물러 있으면 그 화면의 초록 버튼을 최대 12번 눌러
+> 원하지 않는 승천 업그레이드를 사버릴 수 있습니다.**
+>
+> 실제 미니언 화면을 캡처해서 좌표를 확인하기 전까지는 **"미니언 자동 수집"을 꺼 두세요.**
+> 켜서 쓰신다면 [로그] 탭의 `수집한 미니언` / `미니언 버튼 못 찾음` 숫자와,
+> `IdleRunnerLogs\Logs.txt` 의 `Minion Individual Click At x,y` 줄로 어디를 눌렀는지 확인할 수 있습니다.
+
+### 2. 승천 실패 시 화면 닫기
+
+승천 포인트가 0이면 승천이 안 되는데, 원본은 이때 열어 둔 승천 화면을 그대로 두고 끝나서 이후의 모든 클릭이 그 화면에 막혔습니다. 이제 승천할 수 없거나 승천에 실패하면 **ESC → (그래도 안 닫히면) 나가기 버튼** 순서로 화면을 다시 닫습니다.
+
+[로그] 탭의 `자동 승천 성공` / `포인트 부족으로 건너뜀` 숫자로 확인할 수 있습니다.
+
+---
+
+## 실행 방법
+
+### 1) exe 파일로 실행 (쉬움)
+
+바탕화면의 `Idle Runner_한글판_x64.exe` 를 실행하면 됩니다.
+
+백신이 막을 수 있습니다. 매크로 프로그램은 키 입력과 마우스를 대신 조작하기 때문에 백신이 의심스럽게 보는 경우가 흔합니다. 신뢰할 수 없으면 아래 방법으로 직접 컴파일해서 쓰세요.
+
+### 2) 소스에서 직접 컴파일 (조금 번거로움)
+
+1. [AutoIt 전체 설치판과 AutoIt Script Editor](https://www.autoitscript.com/site/autoit/downloads/) 를 **둘 다** 설치합니다.
+
+   (또는 명령 프롬프트에서: `winget install AutoIt.AutoIt` 그리고 `winget install AutoIt.SciTE4AutoIt3`)
+
+2. `Idle Runner.au3` 를 우클릭하고 `Compile with Options` 를 누릅니다.
+
+3. 메뉴에서 `Compile Script` 를 누르면 exe 파일이 만들어집니다.
+
+> **주의:** 소스 파일들은 **UTF-8 (BOM 있음)** 으로 저장되어 있습니다. 다른 인코딩으로 저장하면 한글이 깨지니 편집할 때 주의하세요.
+
+---
+
+## 게임 설정
+
+### 반드시 맞춰야 하는 것
+
+- 게임 해상도 **1280x720**, **창 모드**, 디스플레이 배율 **100%**
+- 게임 언어는 **영어**
+- 게임 창이 **활성 상태**여야 합니다. 아니면 점프만 합니다.
+- **커스텀 커서 끄기**
+- 조작키 설정: 점프 = **위쪽 화살표**, 부스트 = **오른쪽 화살표**
+- 윈도우 11 이면 **관리자 권한**으로 실행
+
+### 권장 설정
+
+- **보너스 스테이지 2, 3** 만 처리할 수 있습니다. 나머지는 [미니게임] 탭에서 "보너스 스테이지 건너뛰기"를 켜세요.
+- 보너스 스테이지 2 를 하려면 승천 업그레이드 **보호(Protect)** 가 필요합니다.
+- 보너스 스테이지 3 을 하려면 승천 업그레이드 **판자 발판(Board The Platforms)** 이 필요합니다.
+- **수직 자석(Vertical Magnet)** 은 사지 마세요.
+- 설정에서 **포탈 대화창 끄기**
+- 설정에서 **반올림 대량 구매 켜기**
+- 설정에서 **잠긴 퀘스트 보상 숨기기 켜기**
+- 승천 고지(Ascending Heights)는 **안나 기본 스킨**을 쓰세요.
+
+### 보스전을 돌릴 경우
+
+- **안나 기본 스킨** 사용
+- **박쥐 장궁(Bat Long bow)** 또는 멀티샷 계열 활 사용
+- 스토리 모드에서 해당 보스를 한 번 이겨 둔 상태여야 합니다.
+
+---
+
+## 화면 구성
+
+| 탭 | 내용 |
+| --- | --- |
+| **홈** | 원본 GitHub, 디스코드, 업데이트 확인 |
+| **일반** | 점프 간격, 자동 업그레이드 구매, 포탈 순환, 자동 승천, 분노 설정, 미니언 설정 |
+| **미니게임** | 보너스 스테이지 건너뛰기, 자물쇠 따기 / 강화 크리스탈 세이버 보유 여부, 퍼펙트 상자 사냥 |
+| **제작** | 소울 나침반, 분노 알약, 차원 / 이차원 지팡이 제작 |
+| **로그** | 왼쪽은 누적 통계, 오른쪽은 현재 상태와 설정 안내 |
+
+각 옵션에 **마우스를 올리면 설명이 나옵니다.** 체크박스뿐 아니라 옆의 글자를 눌러도 켜고 꺼집니다.
+
+[로그] 버튼을 **우클릭**하면 기록을 지울 수 있습니다.
+
+## 단축키
+
+| 키 | 기능 |
+| --- | --- |
+| `Home` | 시작 / 정지 |
+| `Shift` + `Esc` | 종료 |
+| `Ctrl` + `Shift` + `B` | 업그레이드 즉시 구매 |
+
+## 저장되는 파일
+
+프로그램이 있는 폴더에 `IdleRunnerLogs` 폴더가 만들어집니다.
+
+- `Settings.txt` — 체크박스와 숫자 설정
+- `Logs.txt` — 동작 기록. 이 파일 안의 문구는 통계를 세는 데 쓰는 값이라 영어 그대로 둡니다. 화면에는 한글로 나옵니다.
+
+---
+
+## 원본 프로젝트
+
+- 원작자: **Devil4ngle**, **Djahnz**
+- 원본 저장소: <https://github.com/Devil4ngle/Idle_Slayer_Script>
+- 디스코드: [Idle Slayer Scripting Discord](https://discord.gg/aEaBr77UDn)
+- 원작자 후원: [Buy Me a Coffee](https://www.buymeacoffee.com/devil4ngle)
+
+라이선스는 [LICENSE.md](LICENSE.md) 를 참고하세요.

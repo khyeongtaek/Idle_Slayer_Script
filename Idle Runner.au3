@@ -1,79 +1,25 @@
-#NoTrayIcon
+﻿#NoTrayIcon
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Icon=Resources\Icon.ico
-#AutoIt3Wrapper_Outfile=D:\Idle Macro\idleslayer\Idle Runner_x32.exe
-#AutoIt3Wrapper_Outfile_x64=D:\Idle Macro\idleslayer\Idle Runner_x64.exe
+#AutoIt3Wrapper_Outfile=Idle Runner_x64.exe
 #AutoIt3Wrapper_Compression=0
-#AutoIt3Wrapper_Compile_Both=y
+#AutoIt3Wrapper_Compile_Both=n
 #AutoIt3Wrapper_UseX64=y
 #AutoIt3Wrapper_Res_requestedExecutionLevel=None
+#AutoIt3Wrapper_Res_Description=Idle Slayer 매크로 (한글판)
+#AutoIt3Wrapper_Res_Fileversion=3.5.8.0
 #AutoIt3Wrapper_Res_File_Add=Resources\Icon.jpg, RT_RCDATA, ICON,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Welcome.jpg, RT_RCDATA, WELCOME,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Instructions.jpg, RT_RCDATA, INSTRUCTION,0
 #AutoIt3Wrapper_Res_File_Add=Resources\CheckboxUnchecked.jpg, RT_RCDATA, UNCHECKED,0
 #AutoIt3Wrapper_Res_File_Add=Resources\CheckboxChecked.jpg, RT_RCDATA, CHECKED,0
-#AutoIt3Wrapper_Res_File_Add=Resources\CraftRagePill.jpg, RT_RCDATA, RAGEPILL,0
-#AutoIt3Wrapper_Res_File_Add=Resources\CraftSoulBonus.jpg, RT_RCDATA, SOULBONUS,0
-#AutoIt3Wrapper_Res_File_Add=Resources\AutoBuyUpgrades.jpg, RT_RCDATA, AUTOUPGRADES,0
-#AutoIt3Wrapper_Res_File_Add=Resources\CirclePortals.jpg, RT_RCDATA, CIRCLEPORTALS,0
-#AutoIt3Wrapper_Res_File_Add=Resources\SkipBonusStage.jpg, RT_RCDATA, SKIPBONUS,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Home.jpg, RT_RCDATA, HOME,0
-#AutoIt3Wrapper_Res_File_Add=Resources\General.jpg, RT_RCDATA, GENERAL,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Minigames.jpg, RT_RCDATA, MINIGAMES,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Log.jpg, RT_RCDATA, LOG,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Stop.jpg, RT_RCDATA, STOP,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Start.jpg, RT_RCDATA, START,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Exit.jpg, RT_RCDATA, EXIT,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Crafting.jpg, RT_RCDATA, CRAFTING,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Github.jpg, RT_RCDATA, GITHUB,0
-#AutoIt3Wrapper_Res_File_Add=Resources\Update.jpg, RT_RCDATA, UPDATE,0
-#AutoIt3Wrapper_Res_File_Add=Resources\JumpRate.jpg, RT_RCDATA, JUMPRATE,0
-#AutoIt3Wrapper_Res_File_Add=Resources\AutoAscend.jpg, RT_RCDATA, AUTOASCEND,0
-#AutoIt3Wrapper_Res_File_Add=Resources\UpArrow.jpg, RT_RCDATA, UPARROW,0
-#AutoIt3Wrapper_Res_File_Add=Resources\DownArrow.jpg, RT_RCDATA, DOWNARROW,0
-#AutoIt3Wrapper_Res_File_Add=Resources\NoLockpicking.jpg, RT_RCDATA, NOLOCKPICKING,0
-#AutoIt3Wrapper_Res_File_Add=Resources\NoReinforcedCrystalSaver.jpg, RT_RCDATA, NOREINFORCEDCRYSTALSAVER,0
-#AutoIt3Wrapper_Res_File_Add=Resources\CraftBidimensionalStaff.jpg, RT_RCDATA, BIDIMENSIONAL,0
-#AutoIt3Wrapper_Res_File_Add=Resources\CraftDimensionalStaff.jpg, RT_RCDATA, DIMENSIONAL,0
-#AutoIt3Wrapper_Res_File_Add=Resources\PerfectChestHunt.jpg, RT_RCDATA, PERFECTCHESTHUNT,0
-#AutoIt3Wrapper_Res_File_Add=Resources\DisableRage.jpg, RT_RCDATA, DISABLERAGE,0
-#AutoIt3Wrapper_Res_File_Add=Resources\0.jpg, RT_RCDATA, NUM0,0
-#AutoIt3Wrapper_Res_File_Add=Resources\10.jpg, RT_RCDATA, NUM10,0
-#AutoIt3Wrapper_Res_File_Add=Resources\20.jpg, RT_RCDATA, NUM20,0
-#AutoIt3Wrapper_Res_File_Add=Resources\30.jpg, RT_RCDATA, NUM30,0
-#AutoIt3Wrapper_Res_File_Add=Resources\40.jpg, RT_RCDATA, NUM40,0
-#AutoIt3Wrapper_Res_File_Add=Resources\50.jpg, RT_RCDATA, NUM50,0
-#AutoIt3Wrapper_Res_File_Add=Resources\60.jpg, RT_RCDATA, NUM60,0
-#AutoIt3Wrapper_Res_File_Add=Resources\70.jpg, RT_RCDATA, NUM70,0
-#AutoIt3Wrapper_Res_File_Add=Resources\80.jpg, RT_RCDATA, NUM80,0
-#AutoIt3Wrapper_Res_File_Add=Resources\90.jpg, RT_RCDATA, NUM90,0
-#AutoIt3Wrapper_Res_File_Add=Resources\100.jpg, RT_RCDATA, NUM100,0
-#AutoIt3Wrapper_Res_File_Add=Resources\110.jpg, RT_RCDATA, NUM110,0
-#AutoIt3Wrapper_Res_File_Add=Resources\120.jpg, RT_RCDATA, NUM120,0
-#AutoIt3Wrapper_Res_File_Add=Resources\130.jpg, RT_RCDATA, NUM130,0
-#AutoIt3Wrapper_Res_File_Add=Resources\140.jpg, RT_RCDATA, NUM140,0
-#AutoIt3Wrapper_Res_File_Add=Resources\150.jpg, RT_RCDATA, NUM150,0
-#AutoIt3Wrapper_Res_File_Add=Resources\160.jpg, RT_RCDATA, NUM160,0
-#AutoIt3Wrapper_Res_File_Add=Resources\170.jpg, RT_RCDATA, NUM170,0
-#AutoIt3Wrapper_Res_File_Add=Resources\180.jpg, RT_RCDATA, NUM180,0
-#AutoIt3Wrapper_Res_File_Add=Resources\190.jpg, RT_RCDATA, NUM190,0
-#AutoIt3Wrapper_Res_File_Add=Resources\200.jpg, RT_RCDATA, NUM200,0
-#AutoIt3Wrapper_Res_File_Add=Resources\210.jpg, RT_RCDATA, NUM210,0
-#AutoIt3Wrapper_Res_File_Add=Resources\220.jpg, RT_RCDATA, NUM220,0
-#AutoIt3Wrapper_Res_File_Add=Resources\230.jpg, RT_RCDATA, NUM230,0
-#AutoIt3Wrapper_Res_File_Add=Resources\240.jpg, RT_RCDATA, NUM240,0
-#AutoIt3Wrapper_Res_File_Add=Resources\250.jpg, RT_RCDATA, NUM250,0
-#AutoIt3Wrapper_Res_File_Add=Resources\260.jpg, RT_RCDATA, NUM260,0
-#AutoIt3Wrapper_Res_File_Add=Resources\270.jpg, RT_RCDATA, NUM270,0
-#AutoIt3Wrapper_Res_File_Add=Resources\280.jpg, RT_RCDATA, NUM280,0
-#AutoIt3Wrapper_Res_File_Add=Resources\290.jpg, RT_RCDATA, NUM290,0
-#AutoIt3Wrapper_Res_File_Add=Resources\300.jpg, RT_RCDATA, NUM300,0
 #AutoIt3Wrapper_Run_Stop_OnError=y
-#AutoIt3Wrapper_Run_Au3Stripper=y
+#AutoIt3Wrapper_Run_Au3Stripper=n
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #comments-start
- AutoIt Version: 3.3.16.0
- Author: Devil4ngle, Djahnz
+ AutoIt 버전: 3.3.16.0
+ 원작자: Devil4ngle, Djahnz
+ 한글판: 화면 글자를 전부 한글 라벨로 바꾸고 아래 기능을 덧붙였다.
+   - 미니언 자동 수집 켜기/끄기, 리더십 마스터가 없을 때 쓰는 개별 수집 방식
+   - 승천 포인트가 0이라 승천에 실패했을 때 승천 화면을 다시 닫기
 #comments-end
 #include-once
 #include "Libraries\ResourcesEx.au3"
@@ -101,21 +47,21 @@ _AuThread_Startup()
 Main()
 
 Func Main()
-	; Set Hotkey Bindings
+	; 단축키 등록
 	HotKeySet("{Home}", "Pause")
 	HotKeySet("+{Esc}", "IdleClose")
 	HotKeySet("^+b", "AutoUpgrade")
-	; Create Saving Directory
+	; 기록 저장 폴더 만들기
 	DirCreate("IdleRunnerLogs")
-	; Create GUI
+	; 화면 만들기
 	CreateGUI()
 	LoadSettings()
 	GUISetState(@SW_SHOW)
-	; A lot of Global Function are declared in Libraries/GUI
+	; 전역 변수와 함수 상당수는 Libraries\GUI.au3 에 선언되어 있다
 	_AuThread_StartThread("ShootAndBoost", @AutoItPID)
 	SyncProcess()
 
-	; Infinite Loops
+	; 메인 반복문
 	While 1
 		Sleep(40)
 		If $bTogglePause Then ContinueLoop
@@ -126,14 +72,14 @@ Func Main()
 			ControlFocus("Idle Slayer", "", "")
 		EndIf
 
-		; Silver box collect
+		; 은상자 줍기
 		PixelSearch(650, 36, 650, 36, 0xCA9700)
 		If Not @error Then
 			WriteInLogs("Silver Box Collected")
 			MouseClick("left", 644, 49, 1, 0)
 		EndIf
 
-		; Rage when Megahorde
+		; 메가 호드에서 분노 쓰기
 		PixelSearch(385, 280, 385, 280, 0x140C1C)
 		If Not @error Then
 			SyncProcess(False)
@@ -141,7 +87,7 @@ Func Main()
 			SyncProcess(True)
 		EndIf
 
-		; Claim quests
+		; 퀘스트 보상 받기
 		PixelSearch(1130, 610, 1130, 610, 0xCBCB4C)
 		If Not @error Then
 			SyncProcess(False)
@@ -149,22 +95,24 @@ Func Main()
 			SyncProcess(True)
 		EndIf
 
-		; Rage when Soul Bonus
+		; 소울 보너스에서 분노 쓰기
 		PixelSearch(625, 143, 629, 214, 0xA86D0A)
 		If Not @error Then
 			ControlSend("Idle Slayer", "", "", "{r}")
 		EndIf
 
-		; Collect minions
-		PixelSearch(99, 113, 99, 113, 0xFFFF7A)
-		If Not @error Then
-			SyncProcess(False)
-			CollectMinion()
-			SyncProcess(True)
+		; 미니언 수집 ([일반] 탭에서 끄면 이 부분은 아예 건너뛴다)
+		If $bMinionState Then
+			PixelSearch(99, 113, 99, 113, 0xFFFF7A)
+			If Not @error Then
+				SyncProcess(False)
+				CollectMinion()
+				SyncProcess(True)
+			EndIf
 		EndIf
 
 
-		; Chest-hunt
+		; 상자 사냥
 		PixelSearch(187, 296, 187, 296, 0xFFBB31)
 		If Not @error Then
 			PixelSearch(187, 303, 187, 303, 0xF68F37)
@@ -181,7 +129,7 @@ Func Main()
 
 			CloseAll()
 
-			; Bonus stage
+			; 보너스 스테이지
 			PixelSearch(660, 254, 660, 254, 0xFFE737)
 			If Not @error Then
 				PixelSearch(638, 236, 638, 236, 0xFFBB31)
@@ -192,7 +140,7 @@ Func Main()
 				EndIf
 			EndIf
 
-			; Boss Fight
+			; 보스전
 			PixelSearch(639, 224, 639, 224, 0xFF878A)
 			If Not @error Then
 				PixelSearch(634, 224, 634, 224, 0xF263BD)
@@ -211,7 +159,7 @@ Func Main()
 				EndIf
 			EndIf
 
-			; Ascending Heights
+			; 승천 고지 (Ascending Heights)
 			PixelSearch(671, 213, 671, 213, 0xC2F4F9)
 			If Not @error Then
 				PixelSearch(640, 240, 634, 640, 0xFFCC66)
@@ -222,12 +170,12 @@ Func Main()
 				EndIf
 			EndIf
 
-			; Circle portal
+			; 포탈 순환
 			If $bCirclePortalsState Then
 				CirclePortals()
 			EndIf
 
-			; Auto buy upgrades
+			; 업그레이드 자동 구매
 			If $bAutoBuyUpgradeState Then
 				If (($iAutoBuyTempTimer * 60000) < TimerDiff($iTimerAutoBuy)) Then
 					$iTimerAutoBuy = TimerInit()
@@ -242,7 +190,7 @@ Func Main()
 				EndIf
 			EndIf
 
-			; Auto Ascend
+			; 자동 승천
 			If $bAutoAscendState Then
 				If (($iAutoAscendTimer * 60000) < TimerDiff($iTimerAutoAscend)) Then
 					$iTimerAutoAscend = TimerInit()
@@ -302,7 +250,7 @@ Func Rage()
 		BuyTempItem("0x526629")
 		$bBiDimensionalState = False
 		If Not @Compiled Then
-			GUICtrlSetImage($iCheckBoxbDimensionalState, 'Resources\CheckboxUnchecked.jpg')
+			GUICtrlSetImage($iCheckBoxbBiDimensionalState, 'Resources\CheckboxUnchecked.jpg')
 		Else
 			_Resource_SetToCtrlID($iCheckBoxbBiDimensionalState, 'UNCHECKED')
 		EndIf
@@ -324,10 +272,10 @@ EndFunc   ;==>CheckForSoulBonus
 Func BuyTempItem($sHexColor)
 	WriteInLogs("Trying to CraftingTemp Item")
 	Local $aFoundPixel
-	;open menu
+	;메뉴 열기
 	MouseClick("left", 160, 100, 1, 0)
 	Sleep(150)
-	;temp item
+	;임시 아이템 탭
 	MouseClick("left", 260, 690, 1, 0)
 	Sleep(150)
 
@@ -340,83 +288,194 @@ Func BuyTempItem($sHexColor)
 	Else
 		WriteInLogs("CraftingTemp Item Failed, not enough materials")
 	EndIf
-	; Close
+	; 닫기
 	MouseClick("left", 440, 690, 1, 0)
 	Sleep(100)
 EndFunc   ;==>BuyTempItem
 
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 자동 승천.
+;                  승천 포인트가 0이면 승천 버튼이 나오지 않아 승천에 실패하는데, 원본은 이때 열어 둔
+;                  승천 화면을 그대로 두고 끝나 버려서 이후 클릭이 전부 승천 화면에 막혔다.
+;                  그래서 승천이 안 되는 경우에는 반드시 화면을 다시 닫도록 고쳤다.
+; ===============================================================================================================================
 Func AutoAscend()
+	; 승천 화면이 이미 열려 있는 경우
 	PixelSearch(260, 600, 260, 600, 0x58188D)
 	If Not @error Then
-		MouseClick("left", 260, 600, 1, 0)
-		Sleep(300)
-		MouseClick("left", 550, 580, 1, 0)
-		Sleep(300)
-		AutoUpgrade()
+		DoAscend()
+		Return
+	EndIf
+
+	;승천 버튼 클릭
+	MouseClick("left", 95, 90, 1, 0)
+	Sleep(400)
+	;승천 탭 클릭
+	MouseClick("left", 93, 680, 1, 0)
+	Sleep(400)
+
+	PixelSearch(260, 480, 260, 480, 0x58188D)
+	If Not @error Then
+		DoAscend()
 	Else
-		;Click ascension button
-		MouseClick("left", 95, 90, 1, 0)
-		Sleep(400)
-		;Click ascension tab
-		MouseClick("left", 93, 680, 1, 0)
-		Sleep(400)
-		PixelSearch(260, 480, 260, 480, 0x58188D)
-		If Not @error Then
-			MouseClick("left", 260, 600, 1, 0)
-			Sleep(300)
-			MouseClick("left", 550, 580, 1, 0)
-			Sleep(300)
-			AutoUpgrade()
-		EndIf
+		; 승천 포인트가 0이라 승천할 수 없다 -> 방금 연 승천 화면을 닫는다
+		WriteInLogs("Auto Ascend Skipped - No Ascension Points")
+		CloseAscensionMenu()
 	EndIf
 EndFunc   ;==>AutoAscend
 
+; 실제로 승천을 실행한다. 승천이 안 됐으면 화면을 닫고 끝낸다.
+Func DoAscend()
+	;승천 버튼
+	MouseClick("left", 260, 600, 1, 0)
+	Sleep(300)
+	;확인 버튼
+	MouseClick("left", 550, 580, 1, 0)
+	Sleep(600)
+
+	; 확인을 눌렀는데도 승천 버튼이 그대로 보이면 승천이 안 된 것이다
+	PixelSearch(260, 480, 260, 600, 0x58188D)
+	If Not @error Then
+		WriteInLogs("Auto Ascend Failed - Closing Menu")
+		CloseAscensionMenu()
+		Return
+	EndIf
+
+	WriteInLogs("Auto Ascend Done")
+	AutoUpgrade()
+EndFunc   ;==>DoAscend
+
+; 승천 화면을 닫는다.
+; ESC 로 먼저 닫아 보고, 그래도 승천 버튼이 보이면 화면 아래쪽 나가기 버튼을 누른다.
+; 이 함수는 "승천 화면이 열려 있는 것이 확실할 때"만 부른다. 그래야 ESC 가 엉뚱한 메뉴를 열지 않는다.
+Func CloseAscensionMenu()
+	ControlFocus("Idle Slayer", "", "")
+	ControlSend("Idle Slayer", "", "", "{ESC}")
+	Sleep(400)
+
+	; 아직 승천 버튼(보라색)이 보이면 나가기 버튼으로 한 번 더 닫는다
+	PixelSearch(260, 480, 260, 600, 0x58188D)
+	If Not @error Then
+		;나가기 버튼 (미니언 화면에서 쓰는 위치와 같다)
+		MouseClick("left", 570, 694, 1, 0)
+		Sleep(300)
+		ControlSend("Idle Slayer", "", "", "{ESC}")
+		Sleep(300)
+	EndIf
+	WriteInLogs("Ascension Menu Closed")
+EndFunc   ;==>CloseAscensionMenu
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 미니언 화면을 열고 보상을 받은 뒤 다시 임무에 보낸다.
+;                  [일반] 탭의 "리더십 마스터 없음" 설정에 따라 두 가지 방식 중 하나를 쓴다.
+; ===============================================================================================================================
 Func CollectMinion()
-	;Click ascension button
+	;승천 버튼 클릭
 	MouseClick("left", 95, 90, 1, 0)
 	Sleep(400)
-	;Click ascension tab
+	;승천 탭 클릭
 	MouseClick("left", 93, 680, 1, 0)
 	Sleep(200)
-	;Click ascension tree tab
+	;승천 트리 탭 클릭
 	MouseClick("left", 193, 680, 1, 0)
 	Sleep(200)
-	;????
 	MouseClick("left", 691, 680, 1, 0)
 	Sleep(200)
-	;Click minion tab
+	;미니언 탭 클릭
 	MouseClick("left", 332, 680, 1, 0)
 	Sleep(200)
 
-	;Check if Daily Bonus is available
+	If $bNoLeadershipMasterState Then
+		CollectMinionOneByOne()
+	Else
+		CollectMinionWithLeadership()
+	EndIf
+
+	;나가기 클릭
+	MouseClick("left", 570, 694, 1, 0)
+EndFunc   ;==>CollectMinion
+
+; 승천 업그레이드 '리더십 마스터'가 있을 때: [모두 받기] / [모두 보내기] 버튼 한 번씩이면 끝난다.
+Func CollectMinionWithLeadership()
+	;일일 보너스가 있는지 확인
 	PixelSearch(370, 410, 910, 470, 0x11AA23, 9)
 	If Not @error Then
-		;Click Claim All
+		;모두 받기
 		MouseClick("left", 320, 280, 5, 0)
 		Sleep(200)
-		;Click Send All
+		;모두 보내기
 		MouseClick("left", 320, 280, 5, 0)
 		Sleep(200)
-		;Claim Daily Bonus
+		;일일 보너스 받기
 		MouseClick("left", 320, 180, 5, 0)
 		Sleep(200)
 		WriteInLogs("Minions Collect with Daily Bonus")
 	Else
-		;Click Claim All
+		;모두 받기
 		MouseClick("left", 318, 182, 5, 0)
 		Sleep(200)
-		;Click Send All
+		;모두 보내기
 		MouseClick("left", 318, 182, 5, 0)
 		Sleep(200)
 		WriteInLogs("Minions Collect")
 	EndIf
+EndFunc   ;==>CollectMinionWithLeadership
 
-	;Click Exit
-	MouseClick("left", 570, 694, 1, 0)
-EndFunc   ;==>CollectMinion
+; #FUNCTION# ====================================================================================================================
+; !!! 검증되지 않은 기능 !!!
+;      아래 좌표 범위(300,150 ~ 960,660)와 반복 횟수(12)는 실제 게임의 미니언 화면을 보고 정한 값이 아니라
+;      추측으로 넣은 값이다. 찾는 색 0x11AA23 / 0x11A622 도 미니언 전용이 아니라 게임 전반에서 쓰이는
+;      "구매 / 수령 가능" 초록색이라, 탭 이동이 어긋나 승천 트리 화면에 머물러 있으면 그 화면의 초록 버튼을
+;      눌러 원하지 않는 업그레이드를 사버릴 수 있다.
+;      실제 미니언 화면 캡처로 좌표를 확인하기 전에는 [일반] 탭의 "미니언 자동 수집"을 꺼 두는 것이 안전하다.
+;
+; 설명 ..........: 승천 업그레이드 '리더십 마스터'가 없을 때 쓰는 방식.
+;                  이 업그레이드가 없으면 [모두 받기] / [모두 보내기] 버튼 자체가 없어서, 미니언 목록에 있는
+;                  초록색 버튼을 위에서부터 하나씩 눌러 준다. 한 번 누르면 같은 자리가 '임무 보내기'로 바뀌므로
+;                  같은 자리를 두 번 누른다.
+;                  게임 화면을 직접 확인하고 만든 좌표가 아니라 다른 화면들과 같은 초록색을 찾아 누르는 방식이라
+;                  확실하지 않다. 잘 안 되면 [일반] 탭에서 "미니언 자동 수집"을 꺼 두면 된다.
+; ===============================================================================================================================
+Func CollectMinionOneByOne()
+	Local $aLocation
+	Local $iClicked = 0
+
+	; 일일 보너스가 있으면 먼저 받는다
+	PixelSearch(370, 410, 910, 470, 0x11AA23, 9)
+	If Not @error Then
+		MouseClick("left", 320, 180, 3, 0)
+		Sleep(250)
+	EndIf
+
+	; 미니언 목록의 초록색 버튼을 위에서부터 차례로 누른다 (최대 12마리)
+	For $i = 1 To 12
+		$aLocation = PixelSearch(300, 150, 960, 660, 0x11AA23, 12)
+		If @error Then
+			$aLocation = PixelSearch(300, 150, 960, 660, 0x11A622, 12)
+			If @error Then ExitLoop
+		EndIf
+
+		; 어디를 눌렀는지 남겨 둔다. 이 방식은 실제 게임 화면으로 검증한 것이 아니라서,
+		; 나중에 엉뚱한 곳을 눌렀는지 기록으로 확인할 수 있어야 한다.
+		WriteInLogs("Minion Individual Click At " & $aLocation[0] & "," & $aLocation[1])
+		; 보상 받기
+		MouseClick("left", $aLocation[0], $aLocation[1], 1, 0)
+		Sleep(250)
+		; 같은 자리가 임무 보내기 버튼으로 바뀌므로 한 번 더 누른다
+		MouseClick("left", $aLocation[0], $aLocation[1], 1, 0)
+		Sleep(250)
+		$iClicked += 1
+	Next
+
+	If $iClicked > 0 Then
+		WriteInLogs("Minions Collect")
+	Else
+		WriteInLogs("Minions Collect Nothing Found")
+	EndIf
+EndFunc   ;==>CollectMinionOneByOne
 
 Func CirclePortals()
-	;Check if portal button is visible
+	;포탈 버튼이 보이는지 확인
 	Local $iPortalVisible = 0
 	PixelSearch(1180, 166, 1180, 166, 0x830399)
 	If @error Then
@@ -431,21 +490,21 @@ Func CirclePortals()
 		Return
 	EndIf
 
-	;Check if timer is up
+	;대기 시간이 끝났는지 확인
 	PixelSearch(1154, 144, 1210, 155, 0xFFFFFF, 9)
 	If @error Then
 		SyncProcess(False)
-		;Click portal button
+		;포탈 버튼 클릭
 		MouseClick("left", 1180, 150, 1, 0)
 		Sleep(300)
 
-		;Select destination
-		;Top of scrollbar
+		;목적지 고르기
+		;스크롤바 맨 위
 		MouseMove(867, 300, 0)
 		Sleep(200)
 		Do
 			MouseWheel($MOUSE_WHEEL_UP, 20)
-			;Top of searchbar
+			;검색창 맨 위
 			PixelSearch(875, 250, 875, 250, 0xD6D6D6)
 		Until @error
 		Sleep(400)
@@ -453,52 +512,52 @@ Func CirclePortals()
 		Local $sColor = 0x00CBF8
 		Switch $iCirclePortalsCount
 			Case 1
-				;hills
+				;언덕
 				$sColor = 0x00CBF8
 			Case 2
-				;hot desert
+				;사막
 				$sColor = 0xBD4348
 			Case 3
-				;jungle
+				;정글
 				$sColor = 0x009D93
 			Case 4
-				;frozen fields
+				;얼어붙은 평원
 				$sColor = 0x6FF5F8
 			Case 5
-				;funky
+				;펑키
 				$sColor = 0xB362C7
 			Case 6
-				;modern city
+				;현대 도시
 				$sColor = 0x000173
 			Case 7
-				;factory
+				;공장
 				$sColor = 0x00F8B5
 			Case 8
-				;valley
+				;계곡
 				$sColor = 0xE198BF
 			Case 9
-				;castle
+				;성
 				$sColor = 0x4F0085
 		EndSwitch
 		Local $aLocation
 		While 1
 			$aLocation = PixelSearch(470, 230, 470, 540, $sColor, 10)
 			If @error Then
-				;Check gray scroll bar is there
+				;회색 스크롤바가 아직 있는지 확인
 				PixelSearch(875, 536, 875, 536, 0xD6D6D6)
 				If @error Then
 					MouseClick("left", 600, 600, 1, 0)
 					ExitLoop
 				EndIf
 				Sleep(100)
-				;Move mouse on ScrollBar
+				;마우스를 스크롤바 위로 옮긴다
 				MouseMove(867, 300, 0)
 				MouseWheel($MOUSE_WHEEL_DOWN, 1)
 			Else
 				Sleep(300)
 				MouseWheel($MOUSE_WHEEL_DOWN, 1)
 				MouseWheel($MOUSE_WHEEL_DOWN, 1)
-				;Click portal
+				;포탈 클릭
 				MouseClick("left", $aLocation[0] + 300, $aLocation[1], 1, 0)
 				ExitLoop
 			EndIf
@@ -517,13 +576,13 @@ EndFunc   ;==>CirclePortals
 
 Func AutoUpgrade()
 	WriteInLogs("AutoUpgrade Active")
-	;Close Shop window if open
+	;상점 창이 열려 있으면 닫는다
 	MouseClick("left", 1244, 712, 1, 0)
 	Sleep(150)
-	;Open shop window
+	;상점 창 열기
 	MouseClick("left", 1163, 655, 1, 0)
 	Sleep(150)
-	; check with corner if it is open
+	; 모서리 색으로 창이 열렸는지 확인
 	PixelSearch(807, 140, 807, 155, 0xFFFFFF)
 	If Not @error Then
 		BuyUpgrade()
@@ -531,27 +590,27 @@ Func AutoUpgrade()
 EndFunc   ;==>AutoUpgrade
 
 Func BuyEquipment()
-	;Click on armor tab
+	;장비 탭 클릭
 	MouseClick("left", 850, 690, 1, 0)
 	Sleep(50)
-	;Click Max buy
+	;최대 구매 클릭
 	MouseClick("left", 1180, 636, 4, 0)
-	;Check if scrollbar is here if no max buy first item otherwise last item
+	;스크롤바가 있으면 마지막 항목부터, 없으면 첫 항목을 최대 구매한다
 	PixelSearch(1257, 340, 1257, 340, 0x11AA23)
 	If Not @error Then
-		;buy sword
+		;검 구매
 		MouseClick("left", 1200, 200, 5, 0)
 	Else
-		;Click Bottom of scroll bar
+		;스크롤바 맨 아래 클릭
 		MouseClick("left", 1253, 592, 5, 0)
 		Sleep(200)
 	EndIf
 	Local $aLocation
 	While 1
-		;Check if there is any green buy boxes
+		;초록색 구매 버튼이 남아 있는지 확인
 		$aLocation = PixelSearch(1160, 590, 1160, 170, 0x11AA23, 10)
 		If @error Then
-			;Move mouse on ScrollBar
+			;마우스를 스크롤바 위로 옮긴다
 			MouseMove(1260, 170, 0)
 			MouseWheel($MOUSE_WHEEL_UP, 1)
 			PixelSearch(1260, 168, 1260, 168, 0xD6D6D6)
@@ -560,9 +619,9 @@ Func BuyEquipment()
 			EndIf
 			Sleep(10)
 		Else
-			;Click on armor tab
+			;장비 탭 클릭
 			MouseClick("left", 850, 690, 1, 0)
-			;Click Green buy box
+			;초록색 구매 버튼 클릭
 			MouseClick("left", $aLocation[0], $aLocation[1], 5, 0)
 		EndIf
 	WEnd
@@ -570,26 +629,26 @@ Func BuyEquipment()
 EndFunc   ;==>BuyEquipment
 
 Func BuyUpgrade()
-	; Navigate to upgrade and scroll up
+	; 업그레이드 탭으로 가서 맨 위로 올린다
 	MouseClick("left", 927, 683, 1, 0)
 	Sleep(150)
-	; Top of scrollbar
+	; 스크롤바 맨 위
 	MouseMove(1254, 172, 0)
 	Do
 		MouseWheel($MOUSE_WHEEL_UP, 20)
-		;Top of searchbar
+		;검색창 맨 위
 		PixelSearch(1254, 167, 1254, 167, 0xD6D6D6)
 	Until @error
 	Sleep(400)
 	Local $bSomethingBought = False
 	Local $iY = 170
 	While 1
-		; Check if RandomBox Magnet is next upgrade
+		; 다음 업그레이드가 랜덤 상자 자석이면 건너뛴다
 		PixelSearch(882, $iY, 909, $iY + 72, 0xF4B41B)
 		If Not @error Then
 			$iY += 96
 		EndIf
-		; Check if RandomBox Magnet is next upgrade
+		; 다음 업그레이드가 랜덤 상자 자석이면 건너뛴다
 		PixelSearch(882, $iY, 909, $iY + 72, 0xE478FF)
 		If Not @error Then
 			$iY += 96
@@ -602,7 +661,7 @@ Func BuyUpgrade()
 			EndIf
 		EndIf
 		$bSomethingBought = True
-		; Click green buy
+		; 초록색 구매 버튼 클릭
 		MouseClick("left", 1180, $iY, 1, 0)
 		Sleep(50)
 	WEnd
@@ -616,39 +675,39 @@ EndFunc   ;==>BuyUpgrade
 
 Func ClaimQuests()
 	WriteInLogs("Claiming quest")
-	;Close Shop window if open
+	;상점 창이 열려 있으면 닫는다
 	MouseClick("left", 1244, 712, 1, 0)
 	Sleep(150)
-	;Open shop window
+	;상점 창 열기
 	MouseClick("left", 1163, 655, 1, 0)
 	Sleep(150)
-	;Click on armor tab
+	;장비 탭 클릭
 	MouseClick("left", 850, 690, 1, 0)
-	;Click on upgrade tab
+	;업그레이드 탭 클릭
 	MouseClick("left", 927, 683, 1, 0)
 	Sleep(150)
-	;Click on quest tab
+	;퀘스트 탭 클릭
 	MouseClick("left", 1000, 690, 1, 0)
 	Sleep(50)
 
-	; Top of scrollbar
+	; 스크롤바 맨 위
 	MouseMove(1254, 272, 0)
 	Do
 		MouseWheel($MOUSE_WHEEL_UP, 20)
-		;Top of searchbar
+		;검색창 맨 위
 		Sleep(20)
 		PixelSearch(1254, 267, 1254, 267, 0xD6D6D6)
 	Until @error
 	Sleep(600)
 
 	While 1
-		;Check if there is any green buy boxes
+		;초록색 보상 버튼이 남아 있는지 확인
 		$aLocation = PixelSearch(1160, 270, 1160, 590, 0x11A622, 10)
 		If @error Then
-			;Move mouse on ScrollBar
+			;마우스를 스크롤바 위로 옮긴다
 			MouseMove(1267, 270, 0)
 			MouseWheel($MOUSE_WHEEL_DOWN, 1)
-			;Check gray scroll bar is there
+			;회색 스크롤바가 아직 있는지 확인
 			PixelSearch(1267, 658, 1267, 658, 0xA0A0A0)
 			If @error Then
 				ExitLoop
@@ -659,13 +718,13 @@ Func ClaimQuests()
 			EndIf
 			Sleep(100)
 		Else
-			;Click Green buy box
+			;초록색 보상 버튼 클릭
 			WriteInLogs("Quest Claimed")
 			MouseClick("left", $aLocation[0], $aLocation[1], 1, 0)
 		EndIf
 	WEnd
 
-	;Close Shop
+	;상점 닫기
 	MouseClick("left", 1244, 712, 1, 0)
 
 EndFunc   ;==>ClaimQuests
@@ -680,11 +739,11 @@ Func ShootAndBoost()
 	While True
 
 		If TimerDiff($iReadMsg) > 700 Then
-			; Read the message
+			; 메시지 읽기
 			$sPendingMsg = _AuThread_ReadNewMsg()
-			; Check if message is not empty
+			; 메시지가 비어 있지 않은지 확인
 			If UBound($sPendingMsg) > 0 Then
-				; Parse the message
+				; 메시지 해석
 				For $i = 0 To UBound($sPendingMsg) - 1
 					$msg = $sPendingMsg[$i]
 					$msgArray = StringSplit($msg, ";")
@@ -707,9 +766,9 @@ Func ShootAndBoost()
 				Exit
 			EndIf
 			$sPendingMsg = _AuThread_ReadNewMsg()
-			; Check if message is not empty
+			; 메시지가 비어 있지 않은지 확인
 			If UBound($sPendingMsg) > 0 Then
-				; Parse the message
+				; 메시지 해석
 				For $i = 0 To UBound($sPendingMsg) - 1
 					$msg = $sPendingMsg[$i]
 					$msgArray = StringSplit($msg, ";")

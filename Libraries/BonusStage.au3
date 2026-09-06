@@ -1,4 +1,4 @@
-#include-once
+﻿#include-once
 #include "Common.au3"
 
 Func BonusStage($bSkipBonusStageState)
@@ -84,21 +84,21 @@ Func BonusStage3Fail($bSpiritBoost)
 		Return True
 	EndIf
 
-	; Search for Items icon
+	; 아이템 아이콘 찾기
 	PixelSearch(1130, 604, 1130, 604, 0x989898)
 	If Not @error Then
 		WriteInLogs($sLogMsg & " Failed")
 		Return True
 	EndIf
 
-	; Search for Boost icon
+	; 부스트 아이콘 찾기
 	PixelSearch(115, 570, 125, 590, 0x09439b)
 	If Not @error Then
 		WriteInLogs($sLogMsg & " Failed")
 		Return True
 	EndIf
 
-	; Search for Wind Rush icon
+	; 윈드 러시 아이콘 찾기
 	PixelSearch(115, 570, 125, 590, 0x099b66)
 	If Not @error Then
 		WriteInLogs($sLogMsg & " Failed")
@@ -110,10 +110,10 @@ EndFunc   ;==>BonusStage3Fail
 
 Func BonusStage2SB()
 	WriteInLogs("BonusStage2SB")
-	; Section 1 sync
+	; 1구간 동기화
 	FindPixelUntilFound(220, 465, 220, 465, 0xCFBCB8)
 	Sleep(200)
-	;Section 1 start
+	;1구간 시작
 	cSend(94, 1640) ;1
 	cSend(47, 2072) ;2
 	cSend(187, 688) ;3
@@ -128,7 +128,7 @@ Func BonusStage2SB()
 	If BonusStage2Fail() Then
 		Return
 	EndIf
-	; Section 1 Collection
+	; 1구간 수집
 	cSend(40, 2500)
 	For $iX = 1 To 19
 		Send("{Up}")
@@ -138,9 +138,9 @@ Func BonusStage2SB()
 		Return
 	EndIf
 	WriteInLogs("BonusStage2SB Section 1 Complete")
-	; Section 2 sync
+	; 2구간 동기화
 	FindPixelUntilFound(780, 513, 780, 513, 0xBB26DF)
-	; Section 2 start
+	; 2구간 시작
 	cSend(156, 719) ;1
 	cSend(47, 687) ;2
 	cSend(360, 1390) ;3
@@ -167,7 +167,7 @@ Func BonusStage2SB()
 	If BonusStage2Fail() Then
 		Return
 	EndIf
-	; Section 2 Collection
+	; 2구간 수집
 	cSend(350, 1000)
 	For $iX = 1 To 20
 		Send("{Up}")
@@ -177,31 +177,31 @@ Func BonusStage2SB()
 		Return
 	EndIf
 	WriteInLogs("BonusStage2SB Section 2 Complete")
-	;Stage 3 sync
+	;3구간 동기화
 	FindPixelUntilFound(151, 465, 220, 465, 0xCFBCB8)
-	; Section 3 Start
+	; 3구간 시작
 	cSend(109, 1203) ;1
 	cSend(31, 641) ;2
 	cSend(47, 1200) ;3
 	cSend(1, 3100) ;4
-	;repeat
+	;반복
 	cSend(109, 1203) ;5
 	cSend(31, 641) ;6
 	cSend(47, 1200) ;7
 	cSend(1, 3100) ;8
-	;repeat
+	;반복
 	cSend(109, 1203) ;9
 	cSend(31, 641) ;10
 	cSend(47, 1200) ;11
 	cSend(1, 3100) ;12
-	;repeat
+	;반복
 	cSend(109, 1203) ;13
 	cSend(31, 641) ;14
 	cSend(47, 5125) ;15
 	If BonusStage2Fail() Then
 		Return
 	EndIf
-	;Section 3 Collection
+	;3구간 수집
 	cSend(900, 200)
 	For $iX = 1 To 20
 		Send("{Up}")
@@ -211,10 +211,10 @@ Func BonusStage2SB()
 		Return
 	EndIf
 	WriteInLogs("BonusStage2SB Section 3 Complete")
-	;Section 4 sync
+	;4구간 동기화
 	FindPixelUntilFound(250, 472, 100, 250, 0x0D2030)
 	Sleep(200)
-	;Section 4 Start
+	;4구간 시작
 	cSend(32, 2800) ;1
 	cSend(31, 809) ;2
 	cSend(41, 1200) ;3
@@ -240,7 +240,7 @@ Func BonusStage2SB()
 	cSend(31, 850) ;18
 	cSend(41, 840) ;19
 	cSend(641, 300) ;20
-	;Section 4 Collection
+	;4구간 수집
 	For $iX = 1 To 23
 		Send("{Up}")
 		Sleep(500)
@@ -253,10 +253,10 @@ EndFunc   ;==>BonusStage2SB
 
 Func BonusStage2()
 	WriteInLogs("BonusStage2")
-	; Section 1 sync
+	; 1구간 동기화
 	FindPixelUntilFound(220, 465, 220, 465, 0xCFBCB8)
 	Sleep(200)
-	;Section 1 start
+	;1구간 시작
 	cSend(94, 1640) ;1
 	cSend(32, 1218) ;2
 	cSend(94, 600) ;3
@@ -273,7 +273,7 @@ Func BonusStage2()
 	If BonusStage2Fail() Then
 		Return
 	EndIf
-	; Section 1 Collection
+	; 1구간 수집
 	cSend(40, 5000)
 	For $iX = 1 To 17
 		Send("{Up}")
@@ -283,9 +283,9 @@ Func BonusStage2()
 		Return
 	EndIf
 	WriteInLogs("BonusStage2 Section 1 Complete")
-	; Section 2 sync
+	; 2구간 동기화
 	FindPixelUntilFound(780, 513, 780, 513, 0xBB26DF)
-	; Section 2 start
+	; 2구간 시작
 	cSend(156, 719) ;1
 	cSend(47, 687) ;2
 	cSend(360, 1390) ;3
@@ -312,7 +312,7 @@ Func BonusStage2()
 	If BonusStage2Fail() Then
 		Return
 	EndIf
-	; Section 2 Collection
+	; 2구간 수집
 	cSend(350, 1000)
 	For $iX = 1 To 20
 		Send("{Up}")
@@ -322,31 +322,31 @@ Func BonusStage2()
 		Return
 	EndIf
 	WriteInLogs("BonusStage2 Section 2 Complete")
-	;Stage 3 sync
+	;3구간 동기화
 	FindPixelUntilFound(151, 465, 220, 465, 0xCFBCB8)
-	; Section 3 Start
+	; 3구간 시작
 	cSend(109, 1203) ;1
 	cSend(31, 641) ;2
 	cSend(47, 1578) ;3
 	cSend(47, 2437) ;4
-	;repeat
+	;반복
 	cSend(109, 1203) ;5
 	cSend(31, 641) ;6
 	cSend(47, 1578) ;7
 	cSend(47, 2437) ;8
-	;repeat
+	;반복
 	cSend(109, 1203) ;9
 	cSend(31, 641) ;10
 	cSend(47, 1578) ;11
 	cSend(47, 2437) ;12
-	;repeat
+	;반복
 	cSend(109, 1203) ;13
 	cSend(31, 641) ;14
 	cSend(47, 5125) ;15
 	If BonusStage2Fail() Then
 		Return
 	EndIf
-	;Section 3 Collection
+	;3구간 수집
 	cSend(900, 200)
 	For $iX = 1 To 20
 		Send("{Up}")
@@ -356,10 +356,10 @@ Func BonusStage2()
 		Return
 	EndIf
 	WriteInLogs("BonusStage2 Section 3 Complete")
-	;Section 4 sync
+	;4구간 동기화
 	FindPixelUntilFound(250, 472, 100, 250, 0x0D2030)
 	Sleep(200)
-	;Section 4 Start
+	;4구간 시작
 	cSend(32, 1375) ;1
 	cSend(641, 690) ;2
 	cSend(41, 1375) ;3
@@ -375,9 +375,9 @@ Func BonusStage2()
 	cSend(41, 1372) ;13
 	cSend(641, 690) ;14
 	cSend(41, 1371) ;15
-	; extra jump just in case
+	; 혹시 몰라 한 번 더 점프
 	cSend(41) ;16
-	;Section 4 Collection
+	;4구간 수집
 	For $iX = 1 To 23
 		Send("{Up}")
 		Sleep(500)
@@ -477,10 +477,10 @@ Func BonusStage3SB($iCurrentSection = 0)
 EndFunc   ;==>BonusStage3SB
 
 Func BonusStage3Section1($bSpiritBoost = False)
-	; Section 1 sync
+	; 1구간 동기화
 	FindPixelUntilFound(520, 200, 580, 250, 0xFFFFFF)
 	Sleep(360)
-	;Section 1 start
+	;1구간 시작
 	cSend(140, 530) ;1
 	cSend(70, 640) ;2
 	cSend(80, 740) ;3
@@ -523,9 +523,9 @@ Func BonusStage3Section1($bSpiritBoost = False)
 EndFunc   ;==>BonusStage3Section1
 
 Func BonusStage3Section2($bSpiritBoost = False)
-	; Section 2 sync
+	; 2구간 동기화
 	FindPixelUntilFound(306, 200, 309, 275, 0xFFFFFF)
-	; Section 2 start
+	; 2구간 시작
 
 	For $iX = 1 To 2
 		cSend(80, 440) ;1
@@ -563,7 +563,7 @@ EndFunc   ;==>BonusStage3Section2
 
 Func BonusStage3Section3($bSpiritBoost = False)
 	Local $bUpperWay = False
-	;Stage 3 sync
+	;3구간 동기화
 	FindPixelUntilFound(280, 385, 330, 435, 0xFFFFFF)
 	Sleep(600)
 
@@ -614,9 +614,9 @@ Func BonusStage3WallJump($iCount = 5, $iSleep = 50)
 EndFunc   ;==>BonusStage3WallJump
 
 Func BonusStage3Section4($bSpiritBoost = False)
-	;Section 4 sync
+	;4구간 동기화
 	FindPixelUntilFound(330, 170, 380, 195, 0xFFFFFF)
-	;Section 4 Starts
+	;4구간 시작
 	If Not $bSpiritBoost Then
 		For $iX = 1 To 5
 			cSend(300, 600) ;1
@@ -648,9 +648,9 @@ Func CollectLootBS3($bSpiritBoost, $iCount = 25, $bStopEarly = True)
 	If BonusStage3Fail($bSpiritBoost) Then
 		Return False
 	EndIf
-	;Section 3 Collection
+	;3구간 수집
 	For $iX = 1 To $iCount
-		; Check if next section already begins then end earlier
+		; 다음 구간이 이미 시작됐으면 일찍 끝낸다
 		If $bStopEarly = True And $iX > 8 Then
 			$aPos = FindPixelUntilFound(1100, 240, 1100, 440, 0x8D87A2, 480)
 			If IsArray($aPos) Then ExitLoop

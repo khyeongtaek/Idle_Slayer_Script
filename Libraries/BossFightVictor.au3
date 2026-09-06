@@ -1,4 +1,4 @@
-#include-once
+﻿#include-once
 #include "Common.au3"
 
 Func BossFightVictor()
@@ -32,7 +32,7 @@ Func BossBattleVictor()
 		EndIf
 
 		If $iTimer < TimerDiff($hTime) Then
-			;Close Boss Fight
+			;보스전 닫기
 			PixelSearch(835, 477, 835, 477, 0xFD3169)
 			If Not @error Then
 				AdlibUnRegister("Shoot")

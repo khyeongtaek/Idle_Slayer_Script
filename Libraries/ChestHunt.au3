@@ -1,4 +1,4 @@
-#include-once
+﻿#include-once
 #include "Common.au3"
 
 Enum $eRewardChest = 0, $eMimicChest = 1, $e2xChest = 2, $eChestHuntEnd = 3, $eLifeSaverChest = 4
@@ -16,7 +16,7 @@ Func Chesthunt($bNoLockpickingState, $bPerfectChestHuntState, $bNoReinforcedCrys
 	Local $iSaverY = 0
 	Local $iPixelX = 185
 	Local $iPixelY = 325
-	; Locate saver
+	; 라이프 세이버 위치 찾기
 	For $iY = 1 To 3
 		For $iX = 1 To 10
 			PixelSearch($iPixelX, $iPixelY - 1, $iPixelX + 5, $iPixelY, 0xFFEB04)
@@ -31,10 +31,10 @@ Func Chesthunt($bNoLockpickingState, $bPerfectChestHuntState, $bNoReinforcedCrys
 		$iPixelX = 185
 	Next
 
-	; Actual chest hunt
+	; 실제 상자 사냥
 	ProcessChestGrid($iSaverX, $iSaverY, $bNoLockpickingState, $bPerfectChestHuntState, $bNoReinforcedCrystalSaverState)
 
-	; Look for close button or perfect chest until found
+	; 닫기 버튼이나 퍼펙트 상자가 나올 때까지 찾는다
 	Local $bPerfectChest = False
 	Local $iEndScreenAttempts = 0
 	While True
@@ -45,7 +45,7 @@ Func Chesthunt($bNoLockpickingState, $bPerfectChestHuntState, $bNoReinforcedCrys
 		If Not @error Then
 			ExitLoop
 		EndIf
-		; Look for Perfect Chest
+		; 퍼펙트 상자 찾기
 		PixelSearch(457, 439, 457, 439, 0xF68F37)
 		If Not @error Then
 			$bPerfectChest = True
@@ -71,9 +71,9 @@ Func ProcessChestGrid($iSaverX, $iSaverY, $bNoLockpickingState, $bPerfectChestHu
 
 	For $iY = 1 To 3
 		For $iX = 1 To 10
-			; Skip saver no matter what
+			; 어떤 경우에도 라이프 세이버는 건너뛴다
 			If $iPixelY == $iSaverY And $iPixelX == $iSaverX Then
-				; Go next line If saver is last chest
+				; 라이프 세이버가 마지막 상자면 다음 줄로 간다
 				If $iX == 10 Then
 					ExitLoop (1)
 				Else
@@ -105,12 +105,12 @@ EndFunc   ;==>ProcessChestGrid
 
 Func GetUpdatedState($iCount, $iCurrentState, $iChest, $bPerfectChestHuntState, $bNoReinforcedCrystalSaverState)
 
-	; After opening Life Saver just open chests regularly
+	; 라이프 세이버를 연 뒤에는 그냥 순서대로 상자를 연다
 	If $iCurrentState == $eStateNormal Or $iChest == $eLifeSaverChest Then
 		Return $eStateNormal
 	EndIf
 
-	; Always open a Life Saver after 2x chest
+	; 2배 상자를 찾았으면 항상 라이프 세이버를 연다
 	If $iChest == $e2xChest Then
 		Return $eStateOpenLifeSaver
 	EndIf
@@ -120,7 +120,7 @@ Func GetUpdatedState($iCount, $iCurrentState, $iChest, $bPerfectChestHuntState, 
 		If $bPerfectState <> -1 Then Return $bPerfectState
 	EndIf
 
-	; Assign special states for the first 2 chests
+	; 첫 두 상자의 결과로 상태를 정한다
 	If $iCount == 0 Then
 		If $bNoReinforcedCrystalSaverState Then Return $eStateOpenLifeSaver
 
@@ -131,7 +131,7 @@ Func GetUpdatedState($iCount, $iCurrentState, $iChest, $bPerfectChestHuntState, 
 				Return $eStateOneMimic
 		EndSwitch
 	ElseIf $iCount == 1 Then
-		; For normal strategy always open Life Saver after 2nd chest
+		; 일반 전략에서는 두 번째 상자 뒤에 항상 라이프 세이버를 연다
 		If Not $bPerfectChestHuntState Then Return $eStateOpenLifeSaver
 
 		Switch $iCurrentState
@@ -156,12 +156,12 @@ Func GetUpdatedState($iCount, $iCurrentState, $iChest, $bPerfectChestHuntState, 
 EndFunc   ;==>GetUpdatedState
 
 Func PerfectChestHuntState($iChest, $iCurrentState, $iCount)
-	; TLDR: Perfect chest hunt ignore life saver until 2x.
-	; state 0 - First chest - reward, second chest - reward: Open 12 more chests before going for the live saver if you haven't found the 2x chest.
-	; state 1 - First chest – mimic, second chest – reward: Open 14 more chests before going for the life saver if you haven’t found the 2x chest.
-	; state 2 - First chest – mimic, second chest – mimic: Open 20 more chests because the risk of hitting another mimic is lower. After that, go for the life saver if you don’t find the 2x chest.
-	; state 3 - First chest – mimic, second chest – 2x: Immediately open the life saver to gain 2 lives.
-	; state 4 - First chest – 2x: Immediately open the life saver to gain 2 lives.
+	; 요약: 퍼펙트 상자 사냥은 2배 상자를 찾을 때까지 라이프 세이버를 무시한다.
+	; 상태 0 - 첫 상자 보상, 둘째 상자 보상: 2배 상자를 못 찾았으면 12개를 더 연 뒤 라이프 세이버로 간다.
+	; 상태 1 - 첫 상자 미믹, 둘째 상자 보상: 2배 상자를 못 찾았으면 14개를 더 연 뒤 라이프 세이버로 간다.
+	; 상태 2 - 첫 상자 미믹, 둘째 상자 미믹: 미믹이 또 나올 확률이 낮으므로 20개를 더 연다. 그 뒤에도 2배 상자가 없으면 라이프 세이버로 간다.
+	; 상태 3 - 첫 상자 미믹, 둘째 상자 2배: 목숨 2개를 얻기 위해 라이프 세이버를 바로 연다.
+	; 상태 4 - 첫 상자 2배: 목숨 2개를 얻기 위해 라이프 세이버를 바로 연다.
 
 	Switch $iChest
 		Case $eRewardChest
@@ -193,27 +193,27 @@ EndFunc   ;==>OpenLifeSaver
 
 
 Func OpenChest($iPixelX, $iPixelY, $bNoLockpickingState)
-	; Open chest
+	; 상자 열기
 	MouseClick("left", $iPixelX + 33, $iPixelY - 23, 1, 0)
 	If $bNoLockpickingState Then
 		Sleep(1500)
 	Else
 		Sleep(550)
 	EndIf
-	; Check if chest hunt ended
+	; 상자 사냥이 끝났는지 확인
 	PixelSearch(550, 694, 550, 694, 0xAF0000)
 	If Not @error Then
 		Return $eChestHuntEnd
 	EndIf
 
-	; if 2 x wait some more
+	; 2배 상자면 조금 더 기다린다
 	PixelSearch(500, 210, 500, 210, 0x00FF00)
 	If Not @error Then
 		Sleep(1000)
 		Return $e2xChest
 	EndIf
 
-	; if mimic wait some more
+	; 미믹이면 조금 더 기다린다
 	PixelSearch(434, 211, 434, 211, 0xFF0000)
 	If Not @error Then
 		If $bNoLockpickingState Then
