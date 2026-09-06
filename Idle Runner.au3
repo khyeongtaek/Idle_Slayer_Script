@@ -51,6 +51,8 @@ Func Main()
 	HotKeySet("{Home}", "Pause")
 	HotKeySet("+{Esc}", "IdleClose")
 	HotKeySet("^+b", "AutoUpgrade")
+	; 퀘스트 수령과 업그레이드 구매를 한 번에 처리했는지 표시
+	Local $bDoneTogether = False
 	; 기록 저장 폴더 만들기
 	DirCreate("IdleRunnerLogs")
 	; 화면 만들기
@@ -93,7 +95,18 @@ Func Main()
 		PixelSearch(1130, 610, 1130, 610, 0xCBCB4C)
 		If Not @error Then
 			SyncProcess(False)
-			ClaimQuests()
+			; 업그레이드 구매도 이미 실행할 때가 됐다면, 상점을 두 번 여닫지 않고 한 번에 끝낸다.
+			; (퀘스트는 즉시 반응 구간, 자동 구매는 5초 주기 구간이라 원래는 1초쯤 간격을 두고 따로 실행됐다)
+			$bDoneTogether = False
+			If IsAutoBuyDue() Then
+				If ActivateGame() Then
+					ResetAutoBuyTimer()
+					$iAutoBuyLoopAmount = 0
+					ClaimQuestsAndUpgrade()
+					$bDoneTogether = True
+				EndIf
+			EndIf
+			If Not $bDoneTogether Then ClaimQuests()
 			SyncProcess(True)
 		EndIf
 
@@ -178,17 +191,19 @@ Func Main()
 			EndIf
 
 			; 업그레이드 자동 구매
-			If $bAutoBuyUpgradeState Then
-				If (($iAutoBuyTempTimer * 60000) < TimerDiff($iTimerAutoBuy)) Then
-					$iTimerAutoBuy = TimerInit()
-					$iAutoBuyTempTimer = $iAutoBuyTimer
-					WinActivate("Idle Slayer")
-					If WinGetTitle("[ACTIVE]") == "Idle Slayer" Then
-						SyncProcess(False)
-						$iAutoBuyLoopAmount = 0
+			If IsAutoBuyDue() Then
+				ResetAutoBuyTimer()
+				If ActivateGame() Then
+					SyncProcess(False)
+					$iAutoBuyLoopAmount = 0
+					; 받을 퀘스트가 남아 있으면 상점을 한 번만 열고 같이 처리한다
+					PixelSearch(1130, 610, 1130, 610, 0xCBCB4C)
+					If Not @error Then
+						ClaimQuestsAndUpgrade()
+					Else
 						AutoUpgrade()
-						SyncProcess(True)
 					EndIf
+					SyncProcess(True)
 				EndIf
 			EndIf
 
@@ -196,8 +211,7 @@ Func Main()
 			If $bAutoAscendState Then
 				If (($iAutoAscendTimer * 60000) < TimerDiff($iTimerAutoAscend)) Then
 					$iTimerAutoAscend = TimerInit()
-					WinActivate("Idle Slayer")
-					If WinGetTitle("[ACTIVE]") == "Idle Slayer" Then
+					If ActivateGame() Then
 						SyncProcess(False)
 						AutoAscend()
 						SyncProcess(True)
@@ -207,6 +221,24 @@ Func Main()
 		EndIf
 	WEnd
 EndFunc   ;==>Main
+
+; 자동 업그레이드 구매를 실행할 때가 됐는지 확인한다
+Func IsAutoBuyDue()
+	If Not $bAutoBuyUpgradeState Then Return False
+	Return (($iAutoBuyTempTimer * 60000) < TimerDiff($iTimerAutoBuy))
+EndFunc   ;==>IsAutoBuyDue
+
+; 자동 구매 타이머를 다음 주기로 넘긴다
+Func ResetAutoBuyTimer()
+	$iTimerAutoBuy = TimerInit()
+	$iAutoBuyTempTimer = $iAutoBuyTimer
+EndFunc   ;==>ResetAutoBuyTimer
+
+; 게임 창을 활성화하고 실제로 활성 상태가 됐는지 확인한다 (상점 조작은 활성 상태여야 한다)
+Func ActivateGame()
+	WinActivate("Idle Slayer")
+	Return (WinGetTitle("[ACTIVE]") == "Idle Slayer")
+EndFunc   ;==>ActivateGame
 
 Func CloseAll()
 	Sleep(2000)
@@ -576,20 +608,57 @@ Func CirclePortals()
 	EndIf
 EndFunc   ;==>CirclePortals
 
-Func AutoUpgrade()
-	WriteInLogs("AutoUpgrade Active")
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 상점 창을 연다. 이미 열려 있으면 한 번 닫았다가 다시 연다.
+;                  퀘스트 수령과 업그레이드 구매가 똑같이 쓰던 동작이라 공용 함수로 뽑았다.
+; ===============================================================================================================================
+Func OpenShop()
 	;상점 창이 열려 있으면 닫는다
 	MouseClick("left", 1244, 712, 1, 0)
 	Sleep(150)
 	;상점 창 열기
 	MouseClick("left", 1163, 655, 1, 0)
 	Sleep(150)
-	; 모서리 색으로 창이 열렸는지 확인
+EndFunc   ;==>OpenShop
+
+; 상점 창이 실제로 열렸는지 모서리 색으로 확인한다
+Func IsShopOpen()
 	PixelSearch(807, 140, 807, 155, 0xFFFFFF)
-	If Not @error Then
+	Return Not @error
+EndFunc   ;==>IsShopOpen
+
+; 상점 창을 닫는다
+Func CloseShop()
+	MouseClick("left", 1244, 712, 1, 0)
+EndFunc   ;==>CloseShop
+
+Func AutoUpgrade()
+	WriteInLogs("AutoUpgrade Active")
+	OpenShop()
+	If IsShopOpen() Then
 		BuyUpgrade()
 	EndIf
 EndFunc   ;==>AutoUpgrade
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 상점을 한 번만 열고 퀘스트 수령과 업그레이드 구매를 이어서 처리한다.
+;                  둘은 같은 상점 창을 쓰는데도 각자 창을 열고 닫아서, 두 동작이 붙어서 일어날 때
+;                  창을 닫았다가 곧바로 다시 여는 낭비가 있었다. (분리해야 할 이유는 이력에 없었다.
+;                  3.2.9 에서 메인 루프를 즉시 반응용 / 5초 주기용으로 나누면서 갈라진 것뿐이다.)
+;                  마지막 닫기는 BuyUpgrade() 가 알아서 한다.
+; ===============================================================================================================================
+Func ClaimQuestsAndUpgrade()
+	OpenShop()
+	; 여기서는 업그레이드 구매까지 이어지므로, 상점이 안 열렸으면 아무것도 하지 않는다
+	If Not IsShopOpen() Then
+		WriteInLogs("Shop Not Open - Skipped")
+		CloseShop()
+		Return
+	EndIf
+	ClaimQuestsInOpenShop()
+	WriteInLogs("AutoUpgrade Active")
+	BuyUpgrade()
+EndFunc   ;==>ClaimQuestsAndUpgrade
 
 Func BuyEquipment()
 	;장비 탭 클릭
@@ -675,14 +744,17 @@ Func BuyUpgrade()
 	EndIf
 EndFunc   ;==>BuyUpgrade
 
+; 상점을 열고 퀘스트만 받은 뒤 닫는다
 Func ClaimQuests()
+	OpenShop()
+	ClaimQuestsInOpenShop()
+	;상점 닫기
+	CloseShop()
+EndFunc   ;==>ClaimQuests
+
+; 이미 열려 있는 상점에서 퀘스트 보상만 받는다 (창을 열거나 닫지 않는다)
+Func ClaimQuestsInOpenShop()
 	WriteInLogs("Claiming quest")
-	;상점 창이 열려 있으면 닫는다
-	MouseClick("left", 1244, 712, 1, 0)
-	Sleep(150)
-	;상점 창 열기
-	MouseClick("left", 1163, 655, 1, 0)
-	Sleep(150)
 	;장비 탭 클릭
 	MouseClick("left", 850, 690, 1, 0)
 	;업그레이드 탭 클릭
@@ -725,11 +797,7 @@ Func ClaimQuests()
 			MouseClick("left", $aLocation[0], $aLocation[1], 1, 0)
 		EndIf
 	WEnd
-
-	;상점 닫기
-	MouseClick("left", 1244, 712, 1, 0)
-
-EndFunc   ;==>ClaimQuests
+EndFunc   ;==>ClaimQuestsInOpenShop
 
 
 
