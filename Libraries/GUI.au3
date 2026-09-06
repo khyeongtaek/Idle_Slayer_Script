@@ -53,6 +53,7 @@ Global $iJumpSliderValue = 150, _
 		$iTimerAutoBuy = TimerInit(), _
 		$iTimerAutoAscend = TimerInit(), _
 		$iTimerFocusGame = TimerInit(), _
+		$iTimerRemainRefresh = TimerInit(), _
 		$iLastCheckTimeLoop = TimerInit()
 
 ; 설정 파일(IdleRunnerLogs\Settings.txt)에 저장되는 값 목록
@@ -229,22 +230,30 @@ Func CreateGeneralSheet($hGUIForm, $iTabControl)
 	; --- 1행 오른쪽 : 자동 업그레이드 구매 ---
 	Global $iCheckBoxbAutoBuyUpgradeState = CreateOption(520, 44, "자동 업그레이드 구매", 135, _
 			"수직 자석과 전기 지렁이를 뺀 나머지 업그레이드를 자동으로 삽니다. 켜고 10초 뒤에 처음 실행되고, 그 뒤로는 오른쪽에 적은 분마다 실행됩니다.")
-	Global $iAutoBuyNumber = GUICtrlCreateInput($iAutoBuyTimer, 662, 44, 45, 20, $ES_NUMBER)
+	Global $iAutoBuyNumber = GUICtrlCreateInput($iAutoBuyTimer, 683, 44, 45, 20, $ES_NUMBER)
 	GUICtrlSetOnEvent(-1, "EventAutoBuyTimer")
 	GUICtrlSetTip(-1, "업그레이드를 사는 주기 (분)")
-	CreateTextLabel("분마다", 712, 44, 50, 20)
+	CreateTextLabel("분마다", 733, 44, 42, 20)
+	Global $iLabelAutoBuyRemain = CreateTextLabel("", 779, 44, 113, 20, _
+			"다음 자동 구매까지 남은 시간입니다. 정지 중에도 시간은 계속 흐릅니다.")
+	GUICtrlSetFont(-1, 8, 400, 0, $FONT_NAME)
+	GUICtrlSetColor(-1, 0xB9BBBE)
 
 	; --- 2행 왼쪽 : 포탈 순환 ---
 	Global $iCheckBoxbCirclePortalsState = CreateOption(181, 83, "포탈 순환", 200, _
 			"포탈이 준비되는 대로 다음 지역으로 순서대로 이동합니다.")
 
-	; --- 2행 오른쪽 : 자동 승천 ---
-	Global $iCheckBoxbAutoAscendState = CreateOption(520, 83, "자동 승천", 80, _
+	; --- 2행 오른쪽 : 자동 승천 (1행과 같은 열에 맞춘다) ---
+	Global $iCheckBoxbAutoAscendState = CreateOption(520, 83, "자동 승천", 135, _
 			"정해진 시간마다 자동으로 승천합니다. 승천 포인트가 0이면 승천하지 않고 승천 화면을 다시 닫습니다.")
-	Global $iAutoAscendNumber = GUICtrlCreateInput($iAutoAscendTimer, 608, 83, 45, 20, $ES_NUMBER)
+	Global $iAutoAscendNumber = GUICtrlCreateInput($iAutoAscendTimer, 683, 83, 45, 20, $ES_NUMBER)
 	GUICtrlSetOnEvent(-1, "EventAutoAscendTimer")
 	GUICtrlSetTip(-1, "승천하는 주기 (분)")
-	CreateTextLabel("분마다", 658, 83, 50, 20)
+	CreateTextLabel("분마다", 733, 83, 42, 20)
+	Global $iLabelAutoAscendRemain = CreateTextLabel("", 779, 83, 113, 20, _
+			"다음 자동 승천까지 남은 시간입니다. 정지 중에도 시간은 계속 흐릅니다.")
+	GUICtrlSetFont(-1, 8, 400, 0, $FONT_NAME)
+	GUICtrlSetColor(-1, 0xB9BBBE)
 
 	; --- 3행 왼쪽 : 분노 제한 ---
 	Global $iCheckBoxbDisableRageState = CreateOption(181, 122, "소울 보너스 없으면 분노 안 씀", 220, _
@@ -546,6 +555,36 @@ Func EventButtonUpdateClick()
 		EndIf
 	EndIf
 EndFunc   ;==>EventButtonUpdateClick
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 자동 구매 / 자동 승천이 다음에 실행되기까지 남은 시간을 [일반] 탭 오른쪽에 표시한다.
+;                  타이머는 TimerInit / TimerDiff 기반이라 [정지] 중에도 계속 흐른다. 그래서 정지 상태에서도
+;                  똑같이 갱신해 준다. 실제 실행은 [시작] 이후에 이뤄지므로 0 이 되면 "곧 실행"으로 표시한다.
+; ===============================================================================================================================
+Func UpdateRemainingLabels()
+	; 1초에 한 번만 다시 그린다 (메인 반복문은 40ms 마다 돌기 때문)
+	If TimerDiff($iTimerRemainRefresh) < 1000 Then Return
+	$iTimerRemainRefresh = TimerInit()
+
+	GUICtrlSetData($iLabelAutoBuyRemain, RemainingText($bAutoBuyUpgradeState, $iAutoBuyTempTimer, $iTimerAutoBuy))
+	GUICtrlSetData($iLabelAutoAscendRemain, RemainingText($bAutoAscendState, $iAutoAscendTimer, $iTimerAutoAscend))
+EndFunc   ;==>UpdateRemainingLabels
+
+; 남은 시간을 "N시간 NN분 NN초" 형태의 글자로 만든다
+Func RemainingText($bEnabled, $iMinutes, $iTimer)
+	If Not $bEnabled Then Return ""
+
+	Local $iLeft = Int(($iMinutes * 60000 - TimerDiff($iTimer)) / 1000)
+	If $iLeft <= 0 Then Return "곧 실행"
+
+	Local $iHour = Int($iLeft / 3600)
+	Local $iMin = Int(Mod($iLeft, 3600) / 60)
+	Local $iSec = Mod($iLeft, 60)
+
+	If $iHour > 0 Then Return StringFormat("%d시간 %02d분 %02d초", $iHour, $iMin, $iSec)
+	If $iMin > 0 Then Return StringFormat("%d분 %02d초", $iMin, $iSec)
+	Return StringFormat("%d초", $iSec)
+EndFunc   ;==>RemainingText
 
 Func SyncProcess($bJumpState = True)
 	If $bTogglePause == True Then

@@ -64,6 +64,8 @@ Func Main()
 	; 메인 반복문
 	While 1
 		Sleep(40)
+		; 남은 시간 표시는 정지 중에도 갱신한다 (타이머가 정지와 무관하게 흐르기 때문)
+		UpdateRemainingLabels()
 		If $bTogglePause Then ContinueLoop
 
 		If (1800000 < TimerDiff($iTimerFocusGame)) Then
