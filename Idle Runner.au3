@@ -424,57 +424,72 @@ Func CollectMinionWithLeadership()
 EndFunc   ;==>CollectMinionWithLeadership
 
 ; #FUNCTION# ====================================================================================================================
-; !!! 검증되지 않은 기능 !!!
-;      아래 좌표 범위(300,150 ~ 960,660)와 반복 횟수(12)는 실제 게임의 미니언 화면을 보고 정한 값이 아니라
-;      추측으로 넣은 값이다. 찾는 색 0x11AA23 / 0x11A622 도 미니언 전용이 아니라 게임 전반에서 쓰이는
-;      "구매 / 수령 가능" 초록색이라, 탭 이동이 어긋나 승천 트리 화면에 머물러 있으면 그 화면의 초록 버튼을
-;      눌러 원하지 않는 업그레이드를 사버릴 수 있다.
-;      실제 미니언 화면 캡처로 좌표를 확인하기 전에는 [일반] 탭의 "미니언 자동 수집"을 꺼 두는 것이 안전하다.
-;
 ; 설명 ..........: 승천 업그레이드 '리더십 마스터'가 없을 때 쓰는 방식.
-;                  이 업그레이드가 없으면 [모두 받기] / [모두 보내기] 버튼 자체가 없어서, 미니언 목록에 있는
-;                  초록색 버튼을 위에서부터 하나씩 눌러 준다. 한 번 누르면 같은 자리가 '임무 보내기'로 바뀌므로
-;                  같은 자리를 두 번 누른다.
-;                  게임 화면을 직접 확인하고 만든 좌표가 아니라 다른 화면들과 같은 초록색을 찾아 누르는 방식이라
-;                  확실하지 않다. 잘 안 되면 [일반] 탭에서 "미니언 자동 수집"을 꺼 두면 된다.
+;                  이 업그레이드가 없으면 [Claim All] / [Send All] 버튼이 없고, 미니언마다 버튼이 하나씩 있다.
+;                  그래서 퀘스트 수령(ClaimQuests)과 같은 방식으로 버튼 색을 찾아 찾은 자리를 누른다.
+;
+;                  실제 게임 화면에서 확인한 버튼 색 (클라이언트 x=420 기준, 글자가 없는 열이다):
+;                    0x11A622  Claim Reward     - 보상 수령 가능
+;                    0x541787  Send on Mission  - 임무 보내기 대기
+;                    0x975DCA  On a Mission     - 임무 수행 중. 찾지 않으므로 눌리지 않는다.
+;                  버튼 범위는 x 416~612, 첫 행이 y 120, 행 간격 150 이다.
+;
+;                  포인트가 모자라도 [Send on Mission] 색은 그대로라, 눌러도 안 바뀌는 경우가 있다.
+;                  그래서 한 번 처리한 버튼 아래에서부터 다시 찾도록 해 같은 자리를 다시 누르지 않는다.
 ; ===============================================================================================================================
 Func CollectMinionOneByOne()
-	Local $aLocation
-	Local $iClicked = 0
+	Local $iClaimed = 0
+	Local $iSent = 0
 
-	; 일일 보너스가 있으면 먼저 받는다
-	PixelSearch(370, 410, 910, 470, 0x11AA23, 9)
-	If Not @error Then
-		MouseClick("left", 320, 180, 3, 0)
-		Sleep(250)
-	EndIf
+	; 받을 수 있는 보상을 위에서부터 전부 받는다
+	$iClaimed = ClickMinionButtons(0x11A622, "Minion Reward Claimed")
 
-	; 미니언 목록의 초록색 버튼을 위에서부터 차례로 누른다 (최대 12마리)
-	For $i = 1 To 12
-		$aLocation = PixelSearch(300, 150, 960, 660, 0x11AA23, 12)
-		If @error Then
-			$aLocation = PixelSearch(300, 150, 960, 660, 0x11A622, 12)
-			If @error Then ExitLoop
-		EndIf
+	; 그 다음 대기 중인 미니언을 임무로 보낸다.
+	; 보상을 받으면 그 자리가 [Send on Mission] 으로 바뀌므로 반드시 수령 뒤에 해야 한다.
+	$iSent = ClickMinionButtons(0x541787, "Minion Sent On Mission")
 
-		; 어디를 눌렀는지 남겨 둔다. 이 방식은 실제 게임 화면으로 검증한 것이 아니라서,
-		; 나중에 엉뚱한 곳을 눌렀는지 기록으로 확인할 수 있어야 한다.
-		WriteInLogs("Minion Individual Click At " & $aLocation[0] & "," & $aLocation[1])
-		; 보상 받기
-		MouseClick("left", $aLocation[0], $aLocation[1], 1, 0)
-		Sleep(250)
-		; 같은 자리가 임무 보내기 버튼으로 바뀌므로 한 번 더 누른다
-		MouseClick("left", $aLocation[0], $aLocation[1], 1, 0)
-		Sleep(250)
-		$iClicked += 1
-	Next
-
-	If $iClicked > 0 Then
+	If $iClaimed > 0 Or $iSent > 0 Then
 		WriteInLogs("Minions Collect")
 	Else
 		WriteInLogs("Minions Collect Nothing Found")
 	EndIf
 EndFunc   ;==>CollectMinionOneByOne
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 미니언 목록에서 지정한 색의 버튼을 위에서부터 하나씩 눌러 준다.
+;                  한 번 누른 버튼 아래에서부터 다시 찾기 때문에 같은 자리를 두 번 누르지 않는다.
+;                  (포인트 부족으로 눌러도 안 바뀌는 버튼이 있어도 무한 반복에 빠지지 않는다)
+; 매개변수 ......: $iColor   - 찾을 버튼 색
+;                  $sLogText - 한 번 누를 때마다 기록에 남길 문구
+; 반환값 ........: 누른 횟수
+; ===============================================================================================================================
+Func ClickMinionButtons($iColor, $sLogText)
+	Local $aLocation
+	Local $iCount = 0
+	Local $iTop = 115
+
+	While 1
+		; 버튼 왼쪽 여백(글자가 없는 열)을 세로로 훑어 버튼 위쪽 모서리를 찾는다
+		$aLocation = PixelSearch(420, $iTop, 420, 625, $iColor, 10)
+		If @error Then ExitLoop
+
+		; 찾은 자리 기준으로 버튼 한가운데를 누른다 (버튼 높이 약 122)
+		MouseClick("left", $aLocation[0] + 90, $aLocation[1] + 60, 1, 0)
+		Sleep(500)
+
+		; 눌러서 실제로 바뀌었는지 확인한다. 포인트가 모자라면 색이 그대로 남는다.
+		PixelSearch(420, $aLocation[1], 420, $aLocation[1], $iColor, 10)
+		If @error Then
+			WriteInLogs($sLogText)
+			$iCount += 1
+		EndIf
+
+		; 처리 여부와 상관없이 다음 미니언부터 찾는다
+		$iTop = $aLocation[1] + 130
+	WEnd
+
+	Return $iCount
+EndFunc   ;==>ClickMinionButtons
 
 Func CirclePortals()
 	;포탈 버튼이 보이는지 확인

@@ -16,7 +16,8 @@ Func LoadLog($iLog)
 			$iBS3Section1SB = 0, $iBS3Section2SB = 0, $iBS3Section3SB = 0, $iBS3Section4SB = 0, $iBonusStage3 = 0, $iBonusStage3SB = 0, _
 			$iMinionsClaimed = 0, $iQuestClaimed = 0, $iSilverboxColl = 0, $iMegaHordeRage = 0, $iMegaHordeRageSoul = 0, $iChesthunt = 0, $iPerfectChestHunt = 0, _
 			$iBossFightVictorWon = 0, $iBossFightVictor = 0, $iBossFightKnightWon = 0, $iBossFightKnight = 0, $iAscendingHeights = 0, $iAscendingHeightsFailed = 0, _
-			$iAutoAscendDone = 0, $iAutoAscendSkipped = 0, $iMinionsNotFound = 0
+			$iAutoAscendDone = 0, $iAutoAscendSkipped = 0, $iMinionsNotFound = 0, _
+			$iMinionRewardClaimed = 0, $iMinionSent = 0
 	Local $hFile = FileOpen("IdleRunnerLogs\Logs.txt", $FO_READ)
 	If $hFile <> -1 Then
 		While 1
@@ -32,6 +33,10 @@ Func LoadLog($iLog)
 					$iMinionsClaimed += 1
 				Case "Minions Collect Nothing Found"
 					$iMinionsNotFound += 1
+				Case "Minion Reward Claimed"
+					$iMinionRewardClaimed += 1
+				Case "Minion Sent On Mission"
+					$iMinionSent += 1
 				Case "Chesthunt"
 					$iChesthunt += 1
 				Case "Perfect ChestHunt Completed"
@@ -129,6 +134,8 @@ Func LoadLog($iLog)
 	CustomConsole($iLog, "메가 호드 + 소울 보너스로 분노: " & $iMegaHordeRageSoul)
 	CustomConsole($iLog, "받은 퀘스트 보상: " & $iQuestClaimed)
 	CustomConsole($iLog, "수집한 미니언: " & $iMinionsClaimed)
+	CustomConsole($iLog, "  받은 미니언 보상: " & $iMinionRewardClaimed)
+	CustomConsole($iLog, "  임무 보낸 미니언: " & $iMinionSent)
 	CustomConsole($iLog, "상자 사냥: " & $iChesthunt)
 	CustomConsole($iLog, "퍼펙트 상자 사냥: " & $iPerfectChestHunt)
 	CustomConsole($iLog, "주운 은상자: " & $iSilverboxColl)
