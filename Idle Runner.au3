@@ -57,6 +57,9 @@ Func Main()
 	CreateGUI()
 	LoadSettings()
 	GUISetState(@SW_SHOW)
+	; 창 아래 오른쪽 칸(통계 및 도움말)을 채우고, 왼쪽 실시간 로그 칸에 첫 줄을 남긴다
+	RefreshLogInfo()
+	AddLiveLog("Macro Started")
 	; 전역 변수와 함수 상당수는 Libraries\GUI.au3 에 선언되어 있다
 	_AuThread_StartThread("ShootAndBoost", @AutoItPID)
 	SyncProcess()

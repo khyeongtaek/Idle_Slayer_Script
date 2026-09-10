@@ -9,6 +9,7 @@
 #include <WindowsConstants.au3>
 #include <WinAPI.au3>
 #include <WinAPISysWin.au3>
+#include <GuiEdit.au3>
 #include "ResourcesEx.au3"
 #include "Log.au3"
 #include "AutoThreadV3.au3"
@@ -64,13 +65,40 @@ Global $aSettingCheckBoxes[14] = ["bAutoAscendState", "bAutoBuyUpgradeState", "b
 ; 설명 라벨을 눌렀을 때 어느 체크박스를 토글할지 기억해 두는 표 [라벨 ID][체크박스 ID]
 Global $aLabelToCheckBox[0][2]
 
+; ===============================================================================================================================
+; 창 크기
+; 아래쪽에 [실시간 로그] / [통계 및 도움말] 칸을 항상 띄워 두기 위해 세로를 2배 넘게 늘렸다. (200 -> 462)
+; ===============================================================================================================================
+Global Const $iFormWidth = 898
+Global Const $iFormHeight = 462
+Global Const $iLogPanelTop = 208 ; 아래쪽 로그 칸이 시작되는 y 좌표 (탭 영역 바로 아래)
+
+; ===============================================================================================================================
+; 실시간 로그
+; WriteInLogs() 로 기록이 남을 때마다 아래 왼쪽 칸에 한글로 한 줄씩 쌓인다.
+; 정해진 줄 수를 넘기면 가장 오래된 줄부터 밀어내서 창이 무거워지지 않게 한다.
+; ===============================================================================================================================
+Global Const $iLiveLogMaxLines = 300
+Global $aLiveLogLines[$iLiveLogMaxLines]
+Global $iLiveLogLineCount = 0
+
+; 아래쪽 로그 칸의 컨트롤 ID. 화면을 만들기 전에는 0 이고, 이때는 기록 표시를 건너뛴다.
+Global $iLiveLog = 0
+Global $iLogInfo = 0
+
 ; #FUNCTION# ====================================================================================================================
 ; 반환값 ........: 성공 - 창 핸들
 ;                  실패 - 창을 만들지 못하면 0 을 반환하고 @error 를 1 로 설정한다.
 ; ===============================================================================================================================
 Func CreateGUI()
 	; 창 만들기
-	Global $hGUIForm = GUICreate("Idle Runner", 898, 200, @DesktopWidth / 2 - 500, @DesktopHeight - 290, $WS_BORDER + $WS_POPUP)
+	; 창이 길어졌기 때문에 화면 아래로 잘려 나가지 않도록 시작 위치를 보정한다.
+	Local $iFormLeft = @DesktopWidth / 2 - 500
+	Local $iFormTop = @DesktopHeight - 290
+	If $iFormTop + $iFormHeight > @DesktopHeight - 8 Then $iFormTop = @DesktopHeight - $iFormHeight - 8
+	If $iFormTop < 0 Then $iFormTop = 0
+
+	Global $hGUIForm = GUICreate("Idle Runner", $iFormWidth, $iFormHeight, $iFormLeft, $iFormTop, $WS_BORDER + $WS_POPUP)
 	GUISetBkColor($COLOR_WINDOW_BG)
 	; 이후 만들어지는 모든 컨트롤의 기본 폰트를 한글 폰트로 지정한다
 	GUISetFont(9, 400, 0, $FONT_NAME)
@@ -95,7 +123,6 @@ Func CreateGUI()
 	Global $iTabGeneral = CreateGeneralSheet($hGUIForm, $iTabControl)
 	Global $iTabMinigames = CreateMinigamesSheet($hGUIForm, $iTabControl)
 	Global $iTabCrafting = CreateCraftingSheet($hGUIForm, $iTabControl)
-	Global $iTabLog = CreateLogSheet($hGUIForm, $iTabControl)
 
 	; 처음에는 홈 탭을 보여준다
 	GUICtrlSetState($iTabHome, $GUI_SHOW)
@@ -106,27 +133,25 @@ Func CreateGUI()
 	CreateButtonLabel("일반", 1, 44, 160, 24, "EventButtonGeneralClick")
 	CreateButtonLabel("미니게임", 1, 68, 160, 24, "EventButtonMinigamesClick")
 	CreateButtonLabel("제작", 1, 92, 160, 24, "EventButtonCraftingClick")
-	Local $iButtonLog = CreateButtonLabel("로그", 1, 116, 160, 24, "EventButtonLogClick")
-
-	; 로그 버튼 우클릭 메뉴
-	Local $iLogContextMenu = GUICtrlCreateContextMenu($iButtonLog)
-	GUICtrlCreateMenuItem("로그 지우기", $iLogContextMenu)
-	GUICtrlSetOnEvent(-1, "EventMenuClearLogsClick")
 
 	; 현재 동작 상태 표시
-	Global $iLabelStatus = GUICtrlCreateLabel("● 실행 중", 1, 144, 160, 24, BitOR($SS_CENTER, $SS_CENTERIMAGE))
+	; ([로그] 버튼이 없어진 만큼 아래 항목들을 24 씩 위로 올렸다)
+	Global $iLabelStatus = GUICtrlCreateLabel("● 실행 중", 1, 120, 160, 24, BitOR($SS_CENTER, $SS_CENTERIMAGE))
 	GUICtrlSetBkColor(-1, $COLOR_WINDOW_BG)
 	GUICtrlSetColor(-1, $COLOR_RUNNING)
 	GUICtrlSetFont(-1, 9, 600, 0, $FONT_NAME)
 
 	; 시작 / 정지 버튼 (처음에는 동작 중이므로 "정지" 로 표시)
-	Global $iButtonStartStop = CreateButtonLabel("정지", 1, 172, 80, 24, "Pause")
+	Global $iButtonStartStop = CreateButtonLabel("정지", 1, 148, 80, 24, "Pause")
 	GUICtrlSetColor(-1, 0xFF7B7B)
 	GUICtrlSetTip(-1, "매크로를 멈추거나 다시 시작합니다. 단축키: Home")
 
 	; 종료 버튼
-	CreateButtonLabel("종료", 81, 172, 80, 24, "IdleClose")
+	CreateButtonLabel("종료", 81, 148, 80, 24, "IdleClose")
 	GUICtrlSetTip(-1, "매크로를 종료합니다. 단축키: Shift + Esc")
+
+	; 창 아래쪽 로그 칸 (탭과 상관없이 항상 보인다)
+	CreateLogPanel()
 
 	Return $hGUIForm
 EndFunc   ;==>CreateGUI
@@ -195,7 +220,7 @@ Func CreateWelcomeSheet($hGUIForm, $iTabControl)
 	GUICtrlSetColor(-1, $COLOR_TEXT)
 	GUICtrlSetBkColor(-1, $COLOR_PANEL_BG)
 
-	CreateTextLabel("설정 방법은 [로그] 탭 오른쪽 칸에서 확인하세요. 각 옵션에 마우스를 올리면 설명이 나옵니다.", 175, 74, 715, 20)
+	CreateTextLabel("설정 방법은 아래 오른쪽 [통계 및 도움말] 칸에서 확인하세요. 각 옵션에 마우스를 올리면 설명이 나옵니다.", 175, 74, 715, 20)
 	GUICtrlSetColor(-1, 0xB9BBBE)
 
 	CreateButtonLabel("GitHub 원본", 190, 112, 160, 44, "EventButtonGithubClick", 10)
@@ -308,24 +333,55 @@ Func CreateCraftingSheet($hGUIForm, $iTabControl)
 	Return $iTabCrafting
 EndFunc   ;==>CreateCraftingSheet
 
-Func CreateLogSheet($hGUIForm, $iTabControl)
-	Local $iTabLog = GUICtrlCreateTabItem("로그")
-	EventTabSetBkColor($hGUIForm, $iTabControl, $COLOR_PANEL_BG)
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 창 아래쪽에 항상 보이는 로그 칸을 만든다. 세로줄로 좌우 두 칸으로 나눈다.
+;                  왼쪽 - 실시간 로그   : 매크로가 방금 무엇을 했는지 한 줄씩 쌓인다.
+;                  오른쪽 - 통계 및 도움말 : 예전 [로그] 탭에 있던 누적 통계와 설정 안내를 이어서 보여준다.
+; ===============================================================================================================================
+Func CreateLogPanel()
+	Local Const $iGap = 4 ; 칸 사이와 창 가장자리 여백
+	Local Const $iHeaderHeight = 20 ; 칸 제목줄 높이
+	Local $iPaneWidth = Int(($iFormWidth - $iGap * 3) / 2) ; 좌우 칸 하나의 너비
+	Local $iLeftPane = $iGap ; 왼쪽 칸의 x 좌표
+	Local $iRightPane = $iGap * 2 + $iPaneWidth ; 오른쪽 칸의 x 좌표
+	Local $iEditTop = $iLogPanelTop + $iHeaderHeight + 3 ; 글자 상자의 y 좌표
+	Local $iEditHeight = $iFormHeight - $iEditTop - $iGap * 2 ; 글자 상자의 높이
 
-	; 왼쪽 : 누적 기록 통계
-	Global $iLog = GUICtrlCreateEdit("", 172, 34, 350, 158, BitOR($ES_AUTOVSCROLL, $ES_AUTOHSCROLL, $ES_WANTRETURN, $WS_VSCROLL, $ES_READONLY))
-	GUICtrlSetBkColor($iLog, 0x000000)
-	GUICtrlSetColor($iLog, $COLOR_RUNNING)
-	GUICtrlSetFont($iLog, 9, 400, 0, $FONT_NAME)
+	Local $iEditStyle = BitOR($ES_AUTOVSCROLL, $ES_AUTOHSCROLL, $ES_WANTRETURN, $WS_VSCROLL, $ES_READONLY)
 
-	; 오른쪽 : 현재 상태와 설정 안내
-	Global $iLogData = GUICtrlCreateEdit("", 532, 34, 356, 158, BitOR($ES_AUTOVSCROLL, $ES_AUTOHSCROLL, $ES_WANTRETURN, $WS_VSCROLL, $ES_READONLY))
-	GUICtrlSetBkColor($iLogData, 0x000000)
-	GUICtrlSetColor($iLogData, 0xFFBB00)
-	GUICtrlSetFont($iLogData, 9, 400, 0, $FONT_NAME)
+	; --- 왼쪽 칸 : 실시간 로그 ---
+	CreatePanelTitle("실시간 로그", $iLeftPane + 2, $iLogPanelTop, 200, $iHeaderHeight)
 
-	Return $iTabLog
-EndFunc   ;==>CreateLogSheet
+	CreateButtonLabel("화면 지우기", $iLeftPane + $iPaneWidth - 90, $iLogPanelTop, 90, $iHeaderHeight, "EventButtonClearLiveLogClick", 8)
+	GUICtrlSetTip(-1, "실시간 로그 칸에 보이는 글자만 지웁니다. 저장된 기록 파일과 통계는 그대로입니다.")
+
+	$iLiveLog = GUICtrlCreateEdit("", $iLeftPane, $iEditTop, $iPaneWidth, $iEditHeight, $iEditStyle)
+	GUICtrlSetBkColor(-1, 0x000000)
+	GUICtrlSetColor(-1, $COLOR_RUNNING)
+	GUICtrlSetFont(-1, 9, 400, 0, $FONT_NAME)
+
+	; --- 오른쪽 칸 : 통계 및 도움말 ---
+	CreatePanelTitle("통계 및 도움말", $iRightPane + 2, $iLogPanelTop, 200, $iHeaderHeight)
+
+	CreateButtonLabel("새로고침", $iRightPane + $iPaneWidth - 184, $iLogPanelTop, 90, $iHeaderHeight, "EventButtonRefreshLogClick", 8)
+	GUICtrlSetTip(-1, "누적 통계와 게임 창 상태를 다시 읽어서 표시합니다.")
+
+	CreateButtonLabel("기록 지우기", $iRightPane + $iPaneWidth - 90, $iLogPanelTop, 90, $iHeaderHeight, "EventButtonClearLogsClick", 8)
+	GUICtrlSetTip(-1, "저장된 기록 파일(IdleRunnerLogs\Logs.txt)을 지워서 누적 통계를 0 으로 되돌립니다.")
+
+	$iLogInfo = GUICtrlCreateEdit("", $iRightPane, $iEditTop, $iPaneWidth, $iEditHeight, $iEditStyle)
+	GUICtrlSetBkColor(-1, 0x000000)
+	GUICtrlSetColor(-1, 0xFFBB00)
+	GUICtrlSetFont(-1, 9, 400, 0, $FONT_NAME)
+EndFunc   ;==>CreateLogPanel
+
+; 아래쪽 로그 칸의 제목줄을 만든다
+Func CreatePanelTitle($sText, $iLeft, $iTop, $iWidth, $iHeight)
+	GUICtrlCreateLabel($sText, $iLeft, $iTop, $iWidth, $iHeight, $SS_CENTERIMAGE)
+	GUICtrlSetBkColor(-1, $COLOR_WINDOW_BG)
+	GUICtrlSetColor(-1, $COLOR_TEXT)
+	GUICtrlSetFont(-1, 9, 600, 0, $FONT_NAME)
+EndFunc   ;==>CreatePanelTitle
 
 #Region GUI.au3 - #EVENTS#
 Func EventButtonHomeClick()
@@ -344,16 +400,22 @@ Func EventButtonCraftingClick()
 	GUICtrlSetState($iTabCrafting, $GUI_SHOW)
 EndFunc   ;==>EventButtonCraftingClick
 
-Func EventButtonLogClick()
-	GUICtrlSetState($iTabLog, $GUI_SHOW)
-	LoadLog($iLog)
-	LoadDataLog($iLogData)
-EndFunc   ;==>EventButtonLogClick
+; [새로고침] - 누적 통계와 설정 안내를 다시 읽어 온다
+Func EventButtonRefreshLogClick()
+	RefreshLogInfo()
+EndFunc   ;==>EventButtonRefreshLogClick
 
-Func EventMenuClearLogsClick()
+; [기록 지우기] - 저장된 기록 파일을 지우고 통계를 0 으로 되돌린다
+Func EventButtonClearLogsClick()
 	If FileExists("IdleRunnerLogs\Logs.txt") Then FileDelete("IdleRunnerLogs\Logs.txt")
-	LoadLog($iLog)
-EndFunc   ;==>EventMenuClearLogsClick
+	RefreshLogInfo()
+EndFunc   ;==>EventButtonClearLogsClick
+
+; [화면 지우기] - 실시간 로그 칸에 쌓인 글자만 비운다
+Func EventButtonClearLiveLogClick()
+	$iLiveLogLineCount = 0
+	If $iLiveLog <> 0 Then GUICtrlSetData($iLiveLog, "")
+EndFunc   ;==>EventButtonClearLiveLogClick
 
 Func EventTabFocus()
 	Local $iTabIndex = GUICtrlRead($iTabControl)
@@ -585,6 +647,60 @@ Func RemainingText($bEnabled, $iMinutes, $iTimer)
 	If $iMin > 0 Then Return StringFormat("%d분 %02d초", $iMin, $iSec)
 	Return StringFormat("%d초", $iSec)
 EndFunc   ;==>RemainingText
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 창 아래 오른쪽 [통계 및 도움말] 칸을 다시 채운다.
+; ===============================================================================================================================
+Func RefreshLogInfo()
+	If $iLogInfo = 0 Then Return
+	LoadLogPanel($iLogInfo)
+EndFunc   ;==>RefreshLogInfo
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 방금 한 동작을 창 아래 왼쪽 [실시간 로그] 칸에 한 줄 추가한다.
+;                  Common.au3 의 WriteInLogs() 가 기록을 남길 때마다 함께 불린다.
+;                  기록 파일에 적히는 영어 문구는 Log.au3 의 TranslateLogMessage() 가 한글로 바꿔 준다.
+; 매개변수 ......: $sMessage - 기록 파일에 적히는 영어 문구
+; ===============================================================================================================================
+Func AddLiveLog($sMessage)
+	; 화면을 아직 만들지 않았으면 (예: 점프 담당 프로세스) 아무것도 하지 않는다
+	If $iLiveLog = 0 Then Return
+
+	Local $sLine = @HOUR & ":" & @MIN & ":" & @SEC & "  " & TranslateLogMessage($sMessage)
+
+	If $iLiveLogLineCount < $iLiveLogMaxLines Then
+		; 아직 자리가 남아 있으면 뒤에 이어 붙이기만 한다
+		$aLiveLogLines[$iLiveLogLineCount] = $sLine
+		$iLiveLogLineCount += 1
+		GUICtrlSetData($iLiveLog, $sLine & @CRLF, 1)
+		ScrollEditToEnd($iLiveLog)
+	Else
+		; 가득 찼으면 가장 오래된 줄을 밀어내고 전체를 다시 그린다
+		For $i = 0 To $iLiveLogMaxLines - 2
+			$aLiveLogLines[$i] = $aLiveLogLines[$i + 1]
+		Next
+		$aLiveLogLines[$iLiveLogMaxLines - 1] = $sLine
+		RedrawLiveLog()
+	EndIf
+EndFunc   ;==>AddLiveLog
+
+; 보관해 둔 줄들로 실시간 로그 칸을 처음부터 다시 그린다
+Func RedrawLiveLog()
+	If $iLiveLog = 0 Then Return
+	Local $sAll = ""
+	For $i = 0 To $iLiveLogLineCount - 1
+		$sAll &= $aLiveLogLines[$i] & @CRLF
+	Next
+	GUICtrlSetData($iLiveLog, $sAll)
+	ScrollEditToEnd($iLiveLog)
+EndFunc   ;==>RedrawLiveLog
+
+; 글자 상자를 항상 맨 아래(가장 최근 줄)로 내려 준다
+Func ScrollEditToEnd($iCtrl)
+	Local $hEdit = GUICtrlGetHandle($iCtrl)
+	If Not IsHWnd($hEdit) Then Return
+	_GUICtrlEdit_LineScroll($hEdit, 0, _GUICtrlEdit_GetLineCount($hEdit))
+EndFunc   ;==>ScrollEditToEnd
 
 Func SyncProcess($bJumpState = True)
 	If $bTogglePause == True Then

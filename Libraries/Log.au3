@@ -3,13 +3,23 @@
 #Region LogEx.au3 - #FUNCTION#
 
 ; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 창 아래 오른쪽 [통계 및 도움말] 칸을 채운다.
+;                  누적 통계(LoadLog)와 설정 안내(LoadDataLog)를 한 칸에 위아래로 이어서 보여준다.
+; 매개변수 ......: $iCtrl - 글자를 표시할 Edit 컨트롤
+; ===============================================================================================================================
+Func LoadLogPanel($iCtrl)
+	GUICtrlSetData($iCtrl, "")
+	LoadLog($iCtrl)
+	LoadDataLog($iCtrl)
+EndFunc   ;==>LoadLogPanel
+
+; #FUNCTION# ====================================================================================================================
 ; 설명 ..........: 이전에 쌓아 둔 기록 파일을 읽어서 통계를 보여준다.
 ;                  기록 파일(IdleRunnerLogs\Logs.txt)에 적히는 문구 자체는 영어 그대로 둔다.
 ;                  아래 Switch 문이 그 문구를 그대로 비교해서 개수를 세기 때문이고, 화면에는 한글로만 보여준다.
 ; 매개변수 ......: $iLog                 - 글자를 표시할 Edit 컨트롤
 ; ===============================================================================================================================
 Func LoadLog($iLog)
-	Sleep(100)
 	Local $iBS2Section1 = 0, $iBS2Section2 = 0, $iBS2Section3 = 0, $iBS2Section4 = 0, $iBS2Failed = 0, _
 			$iBS2Section1SB = 0, $iBS2Section2SB = 0, $iBS2Section3SB = 0, $iBS2Section4SB = 0, $iBonusStage2 = 0, $iBonusStage2SB = 0, _
 			$iBS3Section1 = 0, $iBS3Section2 = 0, $iBS3Section3 = 0, $iBS3Section4 = 0, $iBS3Failed = 0, $iBS3FailedSB = 0, $iBS3Retried = 0, $iBS3RetriedSB = 0, _
@@ -129,7 +139,7 @@ Func LoadLog($iLog)
 	Local $iBS3TotalFails = $iBS3Failed + $iBS3FailedSB
 	Local $iBS3TotalRetried = $iBS3Retried + $iBS3RetriedSB
 
-	GUICtrlSetData($iLog, "")
+	CustomConsole($iLog, "----------------------누적 통계----------------------")
 	CustomConsole($iLog, "메가 호드만으로 분노: " & $iMegaHordeRage - $iMegaHordeRageSoul)
 	CustomConsole($iLog, "메가 호드 + 소울 보너스로 분노: " & $iMegaHordeRageSoul)
 	CustomConsole($iLog, "받은 퀘스트 보상: " & $iQuestClaimed)
@@ -187,7 +197,7 @@ Func LoadLog($iLog)
 	CustomConsole($iLog, "빅터 전투 패배: " & $iBossFightVictor - $iBossFightVictorWon)
 	CustomConsole($iLog, "기사 전투 진행: " & $iBossFightKnight)
 	CustomConsole($iLog, "기사 전투 승리: " & $iBossFightKnightWon)
-	CustomConsole($iLog, "기사 전투 패배: " & $iBossFightKnight - $iBossFightKnightWon, True)
+	CustomConsole($iLog, "기사 전투 패배: " & $iBossFightKnight - $iBossFightKnightWon)
 EndFunc   ;==>LoadLog
 
 ; #FUNCTION# ====================================================================================================================
@@ -195,8 +205,8 @@ EndFunc   ;==>LoadLog
 ; 매개변수 ......: $iLogData                 - 글자를 표시할 Edit 컨트롤
 ; ===============================================================================================================================
 Func LoadDataLog($iLogData)
-	Sleep(100)
-	GUICtrlSetData($iLogData, "")
+	CustomConsole($iLogData, "")
+	CustomConsole($iLogData, "----------------------설정 안내----------------------")
 
 	If WinExists("Idle Slayer") == 1 Then
 		Local $aArray = WinGetClientSize('Idle Slayer')
@@ -240,3 +250,114 @@ Func CustomConsole($iComponent, $sText, $bAppend = False)
 	EndIf
 	GUICtrlSetData($iComponent, $sText, 1)
 EndFunc   ;==>CustomConsole
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 기록 파일에 적히는 영어 문구를, 창 아래 [실시간 로그] 칸에 보여줄 한글 문구로 바꾼다.
+;                  기록 파일 자체는 영어 그대로 두어야 한다. 위 LoadLog() 의 통계가 그 문구를 세기 때문이다.
+;                  목록에 없는 문구는 바꾸지 않고 그대로 돌려준다.
+; 매개변수 ......: $sMessage - 기록 파일에 적히는 영어 문구
+; 반환값 ........: 화면에 보여줄 한글 문구
+; ===============================================================================================================================
+Func TranslateLogMessage($sMessage)
+	; 보너스 스테이지 문구는 "BonusStage2SB Section 3 Complete" 처럼 형태가 정해져 있어서 규칙으로 처리한다.
+	; ("Start of BonusStage" 나 "Do nothing BonusStage Active" 는 BonusStage 로 시작하지 않으므로 아래 Switch 로 간다)
+	If StringLeft($sMessage, 10) == "BonusStage" Then
+		Local $sRest = StringTrimLeft($sMessage, 10) ; 예: "2SB Section 3 Complete"
+		Local $sStage = StringLeft($sRest, 1) ; "2" 또는 "3"
+		$sRest = StringTrimLeft($sRest, 1) ; 예: "SB Section 3 Complete"
+
+		Local $bSpiritBoost = (StringLeft($sRest, 2) == "SB")
+		If $bSpiritBoost Then $sRest = StringTrimLeft($sRest, 2)
+
+		Local $sName = "보너스 스테이지 " & $sStage & ($bSpiritBoost ? " (영혼 부스트)" : "")
+
+		If $sRest == "" Then Return $sName & " 시작"
+		If $sRest == " Failed" Then Return $sName & " 실패"
+		If $sRest == " Retry" Then Return $sName & " 재시도"
+		If StringLeft($sRest, 9) == " Section " And StringRight($sRest, 9) == " Complete" Then
+			Return $sName & " - " & StringMid($sRest, 10, 1) & "구간 완료"
+		EndIf
+		Return $sMessage
+	EndIf
+
+	Switch $sMessage
+		Case "Macro Started"
+			Return "매크로 시작 - 여기에 방금 한 동작이 표시됩니다"
+		Case "Silver Box Collected"
+			Return "은상자 주움"
+		Case "Minions Collect"
+			Return "미니언 수집 완료"
+		Case "Minions Collect with Daily Bonus"
+			Return "미니언 수집 완료 (일일 보너스 포함)"
+		Case "Minions Collect Nothing Found"
+			Return "미니언: 처리할 것 없음"
+		Case "Minion Reward Claimed"
+			Return "미니언 보상 받음"
+		Case "Minion Sent On Mission"
+			Return "미니언 임무 보냄"
+		Case "Chesthunt Started"
+			Return "상자 사냥 시작"
+		Case "Chsthunt  Blocked divinity  X, Start Again "
+			Return "상자 사냥: 신성 능력에 막힘, 다시 시작"
+		Case "Perfect ChestHunt Completed"
+			Return "퍼펙트 상자 사냥 완료"
+		Case "Claiming quest"
+			Return "퀘스트 보상 받는 중"
+		Case "Quest Claimed"
+			Return "퀘스트 보상 받음"
+		Case "MegaHorde Rage"
+			Return "메가 호드 - 분노 사용"
+		Case "MegaHorde Rage with SoulBonus"
+			Return "메가 호드 + 소울 보너스 확인"
+		Case "Auto Ascend Done"
+			Return "자동 승천 성공"
+		Case "Auto Ascend Skipped - No Ascension Points"
+			Return "자동 승천 건너뜀 (승천 포인트 없음)"
+		Case "Auto Ascend Failed - Closing Menu"
+			Return "자동 승천 실패 - 승천 화면 닫는 중"
+		Case "Ascension Menu Closed"
+			Return "승천 화면 닫음"
+		Case "AutoUpgrade Active"
+			Return "자동 업그레이드 구매 시작"
+		Case "CirclePortals"
+			Return "포탈로 다음 지역 이동"
+		Case "Trying to CraftingTemp Item"
+			Return "임시 아이템 제작 시도"
+		Case "CraftingTemp Item Active"
+			Return "임시 아이템 제작 완료"
+		Case "CraftingTemp Item Failed, not enough materials"
+			Return "임시 아이템 제작 실패 (재료 부족)"
+		Case "Start of BonusStage"
+			Return "보너스 스테이지 진입"
+		Case "Do nothing BonusStage Active"
+			Return "보너스 스테이지 건너뛰는 중"
+		Case "Start of Ascending Heights"
+			Return "승천 고지 시작"
+		Case "Ascending Height Won"
+			Return "승천 고지 성공"
+		Case "Ascending Height Failed"
+			Return "승천 고지 실패"
+		Case "Ascending Heights timed out after 4 minutes"
+			Return "승천 고지 4분 초과로 중단"
+		Case "Start of BossFight Victor"
+			Return "빅터 전투 시작"
+		Case "Victor Stage 2"
+			Return "빅터 전투 2단계"
+		Case "Victor Won"
+			Return "빅터 전투 승리"
+		Case "Victor Lost"
+			Return "빅터 전투 패배"
+		Case "Start of BossFight Knight"
+			Return "기사 전투 시작"
+		Case "Knight Stage 2"
+			Return "기사 전투 2단계"
+		Case "Knight Dark stage"
+			Return "기사 전투 어둠 단계"
+		Case "Knight Won"
+			Return "기사 전투 승리"
+		Case "Knight Lost"
+			Return "기사 전투 패배"
+	EndSwitch
+
+	Return $sMessage
+EndFunc   ;==>TranslateLogMessage

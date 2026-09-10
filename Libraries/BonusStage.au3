@@ -1,6 +1,22 @@
 ﻿#include-once
 #include "Common.au3"
 
+; ===============================================================================================================================
+; 보너스 스테이지 시작 대기 시간 (밀리초)
+;
+; 입장 조작(Slider)이 끝난 뒤부터 실제 발판이 나올 때까지 기다리는 시간이다.
+; 이 시간이 맞지 않으면 첫 구간의 동기화 지점을 놓쳐서 스테이지를 통째로 실패한다.
+; 스테이지 2 와 3 은 시작 연출 길이가 서로 달라서 값을 따로 둔다.
+;
+;   $iBonusStage2StartDelay - 보너스 스테이지 2 에서 쓰는 값
+;   $iBonusStage3StartDelay - 보너스 스테이지 3 에서 쓰는 값
+;
+; 스테이지가 자꾸 실패하면 해당 숫자만 100 단위로 조금씩 바꿔 가며 맞춘다.
+; 숫자를 키우면 더 늦게 시작하고, 줄이면 더 일찍 시작한다.
+; ===============================================================================================================================
+Global Const $iBonusStage2StartDelay = 2900
+Global Const $iBonusStage3StartDelay = 3900
+
 Func BonusStage($bSkipBonusStageState)
 	WriteInLogs("Start of BonusStage")
 	Sleep(200)
@@ -22,7 +38,8 @@ Func BonusStage($bSkipBonusStageState)
 		Return
 	EndIf
 
-	Sleep(3900)
+	; 스테이지 종류에 따라 시작 대기 시간을 다르게 준다
+	Sleep($bBonusStage3 ? $iBonusStage3StartDelay : $iBonusStage2StartDelay)
 	PixelSearch(454, 91, 454, 91, 0xE1E0E2)
 	If Not @error Then
 		If $bBonusStage3 Then

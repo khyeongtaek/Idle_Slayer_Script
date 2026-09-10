@@ -14,8 +14,11 @@ Func setSetting()
 	_WinAPI_SetKeyboardLayout("Idle Slayer", 0x0409)
 EndFunc   ;==>setSetting
 
+; 기록 파일에 한 줄 남기고, 창 아래 [실시간 로그] 칸에도 같은 내용을 한글로 보여준다.
+; 기록 파일에 적히는 문구는 통계를 세는 데 쓰이므로 반드시 영어 그대로 둔다.
 Func WriteInLogs($sMessage)
 	_FileWriteLog("IdleRunnerLogs\Logs.txt", $sMessage)
+	AddLiveLog($sMessage)
 EndFunc   ;==>WriteInLogs
 
 Func cSend($iPressDelay, $iPostPressDelay = 0, $sKey = "Up")
