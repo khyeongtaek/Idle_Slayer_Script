@@ -42,6 +42,27 @@
 #include <AutoItConstants.au3>
 #include <Array.au3>
 
+; ===============================================================================================================================
+; 분노(Rage) 오인식 방지
+;
+; 분노를 쓸지 말지는 화면의 픽셀 색으로만 판단한다. 그런데 판정 조건이 너무 헐거웠다.
+;   - 메가 호드   : (385, 280) 픽셀 한 점, 색 오차 허용 없음
+;   - 소울 보너스 : (625,143)~(629,214) 좁은 세로줄
+; 메인 반복문은 40ms 마다 이 색을 보는데, 보너스 스테이지가 끝나고 화면이 어두워졌다 밝아지는
+; 것처럼 화면이 바뀌는 도중에는 그 자리의 색이 여러 단계를 거쳐 변한다. 그러다 우연히 딱 한 프레임만
+; 판정 색과 같아지면, 메가 호드가 아닌데도 분노를 써 버린다.
+;
+; 진짜 메가 호드나 소울 보너스는 몇 초 동안 이어진다. 그래서 색을 처음 본 뒤 아래 시간 동안
+; 끊기지 않고 계속 보일 때만 진짜로 인정한다. 중간에 한 번이라도 색이 사라지면 처음부터 다시 센다.
+;
+; 숫자를 키우면 더 확실해지지만 진짜 메가 호드에서 분노를 쓰는 시점도 그만큼 늦어진다.
+; ===============================================================================================================================
+Global Const $iRageConfirmDelay = 250 ; 밀리초
+
+Global $iTimerMegaHordeSeen = 0 ; 메가 호드 색을 처음 본 시각 (0 = 안 보이는 중)
+Global $iTimerSoulBonusSeen = 0 ; 소울 보너스 색을 처음 본 시각 (0 = 안 보이는 중)
+Global $bSoulBonusRaging = False ; 소울 보너스 분노를 이미 시작했는지 (기록을 한 번만 남기기 위함)
+
 setSetting()
 _AuThread_Startup()
 Main()
@@ -85,8 +106,10 @@ Func Main()
 		EndIf
 
 		; 메가 호드에서 분노 쓰기
+		; 색이 잠깐 스쳐 지나간 것인지 확인한 뒤에 쓴다 (파일 위쪽 설명 참고)
 		PixelSearch(385, 280, 385, 280, 0x140C1C)
-		If Not @error Then
+		Local $bMegaHordeColor = Not @error
+		If ConfirmPixel($iTimerMegaHordeSeen, $bMegaHordeColor, "MegaHorde Rage Skipped - Screen Changed") Then
 			SyncProcess(False)
 			RageWhenHorde()
 			SyncProcess(True)
@@ -101,9 +124,19 @@ Func Main()
 		EndIf
 
 		; 소울 보너스에서 분노 쓰기
+		; 여기도 같은 방식으로 확인한다 (파일 위쪽 설명 참고)
 		PixelSearch(625, 143, 629, 214, 0xA86D0A)
-		If Not @error Then
+		Local $bSoulBonusColor = Not @error
+		If ConfirmPixel($iTimerSoulBonusSeen, $bSoulBonusColor, "SoulBonus Rage Skipped - Screen Changed") Then
+			; 소울 보너스가 이어지는 동안 계속 눌러서, 분노가 차는 즉시 쓰이게 한다. (원래 동작)
+			; 다만 기록은 소울 보너스가 시작될 때 한 번만 남긴다.
+			If Not $bSoulBonusRaging Then
+				$bSoulBonusRaging = True
+				WriteInLogs("SoulBonus Rage")
+			EndIf
 			ControlSend("Idle Slayer", "", "", "{r}")
+		Else
+			$bSoulBonusRaging = False
 		EndIf
 
 		; 미니언 수집 ([일반] 탭에서 끄면 이 부분은 아예 건너뛴다)
@@ -210,6 +243,31 @@ Func Main()
 		EndIf
 	WEnd
 EndFunc   ;==>Main
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 찾은 색이 화면 전환 중에 한순간만 스쳐 지나간 것인지 걸러 낸다.
+;                  색을 처음 본 시각을 기억해 두고, 같은 색이 $iRageConfirmDelay 밀리초 동안
+;                  끊기지 않고 계속 보일 때만 True 를 돌려준다.
+;                  메인 반복문이 40ms 마다 돌기 때문에 그 사이 한 번이라도 색이 사라지면 처음부터 다시 센다.
+;                  기다리는 동안 화면을 멈추지 않으므로 다른 감지(은상자, 퀘스트 등)는 그대로 돌아간다.
+; 매개변수 ......: $iSeenTimer - 색을 처음 본 시각을 담아 두는 변수. 이 함수가 알아서 갱신한다.
+;                  $bFound     - 이번 차례에 그 색을 찾았는지 여부
+;                  $sSkipLog   - 인정되기 전에 색이 사라졌을 때 기록에 남길 문구. "" 이면 남기지 않는다.
+; 반환값 ........: 충분히 오래 이어졌으면 True, 아니면 False
+; ===============================================================================================================================
+Func ConfirmPixel(ByRef $iSeenTimer, $bFound, $sSkipLog = "")
+	If Not $bFound Then
+		; 인정되기 전에 사라졌다면 화면이 바뀌는 도중에 한순간만 같은 색이었던 것이다
+		If $iSeenTimer <> 0 And TimerDiff($iSeenTimer) < $iRageConfirmDelay And $sSkipLog <> "" Then
+			WriteInLogs($sSkipLog)
+		EndIf
+		$iSeenTimer = 0
+		Return False
+	EndIf
+
+	If $iSeenTimer = 0 Then $iSeenTimer = TimerInit()
+	Return (TimerDiff($iSeenTimer) >= $iRageConfirmDelay)
+EndFunc   ;==>ConfirmPixel
 
 Func CloseAll()
 	Sleep(2000)
