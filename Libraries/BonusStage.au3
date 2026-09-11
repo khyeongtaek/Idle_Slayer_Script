@@ -493,6 +493,41 @@ Func BonusStage3SB($iCurrentSection = 0)
 
 EndFunc   ;==>BonusStage3SB
 
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 구간을 시작하기 전에 화면과 박자를 맞춘다. 지금은 4구간에서만 쓴다.
+;                  각 구간은 화면을 보지 않고 미리 짜 둔 점프 순서를 그대로 재생하기 때문에,
+;                  시작 지점을 못 잡으면 그 뒤는 전부 어긋난다.
+;
+;                  원래는 FindPixelUntilFound() 가 시간 안에 못 찾아도 그 사실을 확인하지 않고
+;                  그대로 점프를 시작했다. 그래서 15초를 기다린 뒤 20초 넘게 허공에 점프를 하고 나서야
+;                  실패를 알아차렸다. 이제는 못 찾으면 바로 실패로 보고 재시도로 넘긴다.
+;
+;                  1~3구간은 원래대로(못 찾아도 그대로 진행) 두고 4구간에만 적용해서,
+;                  이 방식이 실제로 도움이 되는지 먼저 확인한다.
+;
+;                  박자를 맞추는 데 걸린 시간도 기록에 남긴다. 몇백 ms 면 제대로 잡은 것이고,
+;                  15000 에 가까우면 거의 놓칠 뻔한 것이라 구간이 실패했을 때 원인을 가리는 데 쓴다.
+; 매개변수 ......: $iX1, $iY1, $iX2, $iY2 - 동기화 지점을 찾을 범위
+;                  $iSection     - 구간 번호 (기록에 남길 용도)
+;                  $bSpiritBoost - 영혼 부스트 여부
+; 반환값 ........: 박자를 맞췄으면 True, 못 맞췄으면 False
+; ===============================================================================================================================
+Func BonusStage3Sync($iX1, $iY1, $iX2, $iY2, $iSection, $bSpiritBoost)
+	Local $hTimer = TimerInit()
+	Local $vFound = FindPixelUntilFound($iX1, $iY1, $iX2, $iY2, 0xFFFFFF)
+	Local $iElapsed = Round(TimerDiff($hTimer))
+
+	If IsArray($vFound) Then
+		WriteInLogs(GetBS3LogText($bSpiritBoost) & " Section " & $iSection & " Sync " & $iElapsed & "ms")
+		Return True
+	EndIf
+
+	WriteInLogs(GetBS3LogText($bSpiritBoost) & " Section " & $iSection & " Sync Failed")
+	; 이미 실패 화면이 떠 있으면 여기서 재시도 버튼을 눌러 둔다
+	BonusStage3Fail($bSpiritBoost)
+	Return False
+EndFunc   ;==>BonusStage3Sync
+
 Func BonusStage3Section1($bSpiritBoost = False)
 	; 1구간 동기화
 	FindPixelUntilFound(520, 200, 580, 250, 0xFFFFFF)
@@ -632,7 +667,7 @@ EndFunc   ;==>BonusStage3WallJump
 
 Func BonusStage3Section4($bSpiritBoost = False)
 	;4구간 동기화
-	FindPixelUntilFound(330, 170, 380, 195, 0xFFFFFF)
+	If Not BonusStage3Sync(330, 170, 380, 195, 4, $bSpiritBoost) Then Return False
 	;4구간 시작
 	If Not $bSpiritBoost Then
 		For $iX = 1 To 5

@@ -277,6 +277,14 @@ Func TranslateLogMessage($sMessage)
 		If StringLeft($sRest, 9) == " Section " And StringRight($sRest, 9) == " Complete" Then
 			Return $sName & " - " & StringMid($sRest, 10, 1) & "구간 완료"
 		EndIf
+		If StringLeft($sRest, 9) == " Section " And StringRight($sRest, 12) == " Sync Failed" Then
+			Return $sName & " - " & StringMid($sRest, 10, 1) & "구간 진입 실패 (박자를 못 맞춤)"
+		EndIf
+		; " Section 4 Sync 420ms" 처럼 박자를 맞추는 데 걸린 시간
+		Local $aSync = StringRegExp($sRest, "^ Section (\d+) Sync (\d+)ms$", 1)
+		If IsArray($aSync) Then
+			Return $sName & " - " & $aSync[0] & "구간 진입 (박자 맞추는 데 " & $aSync[1] & "ms)"
+		EndIf
 		Return $sMessage
 	EndIf
 
