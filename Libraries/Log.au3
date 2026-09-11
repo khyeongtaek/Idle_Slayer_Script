@@ -311,8 +311,6 @@ Func TranslateLogMessage($sMessage)
 			Return "메가 호드 - 분노 사용"
 		Case "MegaHorde Rage with SoulBonus"
 			Return "메가 호드 + 소울 보너스 확인"
-		Case "MegaHorde Rage Skipped - Screen Changed"
-			Return "메가 호드 잘못 본 것 걸러냄 (화면 전환 중)"
 		Case "SoulBonus Rage"
 			Return "소울 보너스 - 분노 사용"
 		Case "SoulBonus Rage Skipped - Screen Changed"
