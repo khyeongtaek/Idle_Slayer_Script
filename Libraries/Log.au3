@@ -313,8 +313,6 @@ Func TranslateLogMessage($sMessage)
 			Return "메가 호드 + 소울 보너스 확인"
 		Case "SoulBonus Rage"
 			Return "소울 보너스 - 분노 사용"
-		Case "SoulBonus Rage Skipped - Screen Changed"
-			Return "소울 보너스 잘못 본 것 걸러냄 (화면 전환 중)"
 		Case "Auto Ascend Done"
 			Return "자동 승천 성공"
 		Case "Auto Ascend Skipped - No Ascension Points"

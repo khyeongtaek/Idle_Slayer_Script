@@ -61,24 +61,16 @@ Global Const $MINION_CLAIM_COLOR = 0x11A622 ; [Claim Reward]    보상 수령 �
 Global Const $MINION_SEND_COLOR = 0x541787 ; [Send on Mission] 임무 보내기 대기 (진보라)
 
 ; ===============================================================================================================================
-; 소울 보너스 분노(Rage) 오인식 방지
+; 소울 보너스 분노 기록
 ;
-; 소울 보너스 분노는 (625,143)~(629,214) 의 좁은 세로줄 색만 보고 R 을 누른다.
-; 메인 반복문은 40ms 마다 이 색을 보는데, 보너스 스테이지가 끝나고 화면이 어두워졌다 밝아지는
-; 것처럼 화면이 바뀌는 도중에는 그 자리의 색이 여러 단계를 거쳐 변한다.
-; 그러다 우연히 딱 한 프레임만 판정 색과 같아지면 소울 보너스가 아닌데도 분노를 써 버린다.
+; 소울 보너스 분노는 색만 맞으면 40ms 마다 계속 R 을 눌러서, 분노가 차는 즉시 쓰이게 한다.
+; 원본은 여기에 기록을 전혀 남기지 않아서, 분노가 이유 없이 나갔을 때 메가 호드 쪽인지
+; 소울 보너스 쪽인지 가려낼 방법이 없었다. 그래서 기록만 남기도록 했다.
 ;
-; 진짜 소울 보너스는 몇 초 동안 이어진다. 그래서 색을 처음 본 뒤 아래 시간 동안 끊기지 않고
-; 계속 보일 때만 진짜로 인정한다. 중간에 한 번이라도 색이 사라지면 처음부터 다시 센다.
-; 숫자를 키우면 더 확실해지지만 진짜 소울 보너스에서 분노를 쓰는 시점도 그만큼 늦어진다.
-;
-; 메가 호드 판정((385,280) 픽셀 한 점)에도 같은 장치를 넣었다가 되돌렸다.
-; 지금은 원래대로, 그 색이 보이면 확인 없이 바로 분노를 쓴다.
+; 다만 40ms 마다 남기면 기록 파일이 순식간에 불어나므로, 소울 보너스가 시작될 때 한 번만 남긴다.
+; 아래 변수는 "이미 기록을 남겼는지"만 기억한다. 분노를 쓸지 말지에는 전혀 관여하지 않는다.
 ; ===============================================================================================================================
-Global Const $iRageConfirmDelay = 250 ; 밀리초
-
-Global $iTimerSoulBonusSeen = 0 ; 소울 보너스 색을 처음 본 시각 (0 = 안 보이는 중)
-Global $bSoulBonusRaging = False ; 소울 보너스 분노를 이미 시작했는지 (기록을 한 번만 남기기 위함)
+Global $bSoulBonusRaging = False ; 이번 소울 보너스에서 이미 기록을 남겼는지
 
 setSetting()
 _AuThread_Startup()
@@ -139,17 +131,14 @@ Func Main()
 		EndIf
 
 		; 소울 보너스에서 분노 쓰기
-		; 여기도 같은 방식으로 확인한다 (파일 위쪽 설명 참고)
 		PixelSearch(625, 143, 629, 214, 0xA86D0A)
-		Local $bSoulBonusColor = Not @error
-		If ConfirmPixel($iTimerSoulBonusSeen, $bSoulBonusColor, "SoulBonus Rage Skipped - Screen Changed") Then
-			; 소울 보너스가 이어지는 동안 계속 눌러서, 분노가 차는 즉시 쓰이게 한다. (원래 동작)
-			; 다만 기록은 소울 보너스가 시작될 때 한 번만 남긴다.
+		If Not @error Then
+			ControlSend("Idle Slayer", "", "", "{r}")
+			; 기록만 소울 보너스가 시작될 때 한 번 남긴다 (파일 위쪽 설명 참고)
 			If Not $bSoulBonusRaging Then
 				$bSoulBonusRaging = True
 				WriteInLogs("SoulBonus Rage")
 			EndIf
-			ControlSend("Idle Slayer", "", "", "{r}")
 		Else
 			$bSoulBonusRaging = False
 		EndIf
@@ -258,31 +247,6 @@ Func Main()
 		EndIf
 	WEnd
 EndFunc   ;==>Main
-
-; #FUNCTION# ====================================================================================================================
-; 설명 ..........: 찾은 색이 화면 전환 중에 한순간만 스쳐 지나간 것인지 걸러 낸다.
-;                  색을 처음 본 시각을 기억해 두고, 같은 색이 $iRageConfirmDelay 밀리초 동안
-;                  끊기지 않고 계속 보일 때만 True 를 돌려준다.
-;                  메인 반복문이 40ms 마다 돌기 때문에 그 사이 한 번이라도 색이 사라지면 처음부터 다시 센다.
-;                  기다리는 동안 화면을 멈추지 않으므로 다른 감지(은상자, 퀘스트 등)는 그대로 돌아간다.
-; 매개변수 ......: $iSeenTimer - 색을 처음 본 시각을 담아 두는 변수. 이 함수가 알아서 갱신한다.
-;                  $bFound     - 이번 차례에 그 색을 찾았는지 여부
-;                  $sSkipLog   - 인정되기 전에 색이 사라졌을 때 기록에 남길 문구. "" 이면 남기지 않는다.
-; 반환값 ........: 충분히 오래 이어졌으면 True, 아니면 False
-; ===============================================================================================================================
-Func ConfirmPixel(ByRef $iSeenTimer, $bFound, $sSkipLog = "")
-	If Not $bFound Then
-		; 인정되기 전에 사라졌다면 화면이 바뀌는 도중에 한순간만 같은 색이었던 것이다
-		If $iSeenTimer <> 0 And TimerDiff($iSeenTimer) < $iRageConfirmDelay And $sSkipLog <> "" Then
-			WriteInLogs($sSkipLog)
-		EndIf
-		$iSeenTimer = 0
-		Return False
-	EndIf
-
-	If $iSeenTimer = 0 Then $iSeenTimer = TimerInit()
-	Return (TimerDiff($iSeenTimer) >= $iRageConfirmDelay)
-EndFunc   ;==>ConfirmPixel
 
 Func CloseAll()
 	Sleep(2000)
