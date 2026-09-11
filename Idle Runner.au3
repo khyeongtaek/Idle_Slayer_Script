@@ -42,6 +42,24 @@
 #include <AutoItConstants.au3>
 #include <Array.au3>
 
+; 미니언 화면 좌표 (리더십 마스터가 없어서 미니언마다 버튼이 하나씩 있는 화면)
+; 이 스크립트는 Opt("PixelCoordMode"/"MouseCoordMode", 0) 이라 좌표가 전부 "활성 창" 기준이다.
+; 창 테두리와 제목 표시줄 때문에 게임 화면(클라이언트) 좌표보다 x 는 8, y 는 31 크다.
+; 아래 괄호 안의 값이 게임 화면 기준 좌표다.
+; [Daily Bonus] 칸이 없을 때가 기준이고, 칸이 남아 있으면 목록이 $MINION_BONUS_HEIGHT 만큼 내려간다.
+Global Const $MINION_LIST_TOP = 139 ; 목록(스크롤 영역) 위 끝 (108)
+Global Const $MINION_LIST_BOTTOM = 653 ; 목록 아래 끝 (622)
+Global Const $MINION_CLICK_BOTTOM = 631 ; 여기보다 아래에서 찾은 버튼은 다음 스크롤에서 처리한다 (600)
+Global Const $MINION_BONUS_HEIGHT = 103 ; [Daily Bonus] 칸 높이
+Global Const $MINION_SCROLL_X = 627 ; 스크롤바 가운데 열 (619). 손잡이 흰색 0xFFFFFF / 트랙 회색 0xD6D6D6
+Global Const $MINION_TEXT_X = 208 ; 미니언 이름이 있는 왼쪽 (200). 마우스를 버튼 밖으로 비켜 둘 때 쓴다
+Global Const $MINION_BTN_X = 488 ; 행동 버튼 가운데 (480)
+Global Const $MINION_BTN_X1 = 410 ; 행동 버튼 왼쪽 여백 (402~408). 글자가 없어서 색이 깨끗한 열이다
+Global Const $MINION_BTN_X2 = 416
+Global Const $MINION_BTN_HEIGHT = 67 ; 행동 버튼 높이 (미니언 한 칸은 150)
+Global Const $MINION_CLAIM_COLOR = 0x11A622 ; [Claim Reward]    보상 수령 가능 (초록)
+Global Const $MINION_SEND_COLOR = 0x541787 ; [Send on Mission] 임무 보내기 대기 (진보라)
+
 setSetting()
 _AuThread_Startup()
 Main()
@@ -426,27 +444,33 @@ EndFunc   ;==>CollectMinionWithLeadership
 ; #FUNCTION# ====================================================================================================================
 ; 설명 ..........: 승천 업그레이드 '리더십 마스터'가 없을 때 쓰는 방식.
 ;                  이 업그레이드가 없으면 [Claim All] / [Send All] 버튼이 없고, 미니언마다 버튼이 하나씩 있다.
-;                  그래서 퀘스트 수령(ClaimQuests)과 같은 방식으로 버튼 색을 찾아 찾은 자리를 누른다.
+;                  그래서 퀘스트 수령(ClaimQuests)과 같은 방식으로 버튼 색을 찾아 누르고,
+;                  스크롤을 한 칸씩 내리며 목록 끝까지 훑는다.
 ;
-;                  실제 게임 화면에서 확인한 버튼 색 (클라이언트 x=420 기준, 글자가 없는 열이다):
-;                    0x11A622  Claim Reward     - 보상 수령 가능
-;                    0x541787  Send on Mission  - 임무 보내기 대기
-;                    0x975DCA  On a Mission     - 임무 수행 중. 찾지 않으므로 눌리지 않는다.
-;                  버튼 범위는 x 416~612, 첫 행이 y 120, 행 간격 150 이다.
+;                  실제 게임 화면에서 확인한 버튼 색 (버튼 왼쪽 여백 x 410~416 기준, 글자가 없는 열이다):
+;                    0x11A622  Claim Reward      - 보상 수령 가능 (초록)
+;                    0x541787  Send on Mission   - 임무 보내기 대기 (진보라)
+;                    0x975DCA  On a Mission...   - 임무 수행 중. 찾지 않으므로 눌리지 않는다.
+;                    0xF88F00  +N 깃털           - 레벨 올리기. 찾지 않으므로 눌리지 않는다.
 ;
-;                  포인트가 모자라도 [Send on Mission] 색은 그대로라, 눌러도 안 바뀌는 경우가 있다.
-;                  그래서 한 번 처리한 버튼 아래에서부터 다시 찾도록 해 같은 자리를 다시 누르지 않는다.
+;                  하루에 한 번 나오는 [Daily Bonus] 칸을 먼저 받는다. 받으면 모든 미니언의 남은 시간이
+;                  3시간 줄어 끝난 임무가 더 생기고, 그 칸이 사라지면서 목록이 위로 올라온다.
+;
+;                  미니언이 적어서 스크롤바가 없을 때도, 많아서 여러 번 굴려야 할 때도 같은 코드로 처리된다.
 ; ===============================================================================================================================
 Func CollectMinionOneByOne()
-	Local $iClaimed = 0
-	Local $iSent = 0
+	; 목록이 다 그려질 때까지 잠깐 기다린다
+	Sleep(500)
+
+	; 일일 보너스를 먼저 받는다. 남은 시간이 3시간 줄면서 받을 수 있는 보상이 더 생긴다
+	Local $iListTop = ClaimMinionDailyBonus()
 
 	; 받을 수 있는 보상을 위에서부터 전부 받는다
-	$iClaimed = ClickMinionButtons(0x11A622, "Minion Reward Claimed")
+	Local $iClaimed = ClickMinionButtons($MINION_CLAIM_COLOR, $iListTop, "Minion Reward Claimed")
 
 	; 그 다음 대기 중인 미니언을 임무로 보낸다.
 	; 보상을 받으면 그 자리가 [Send on Mission] 으로 바뀌므로 반드시 수령 뒤에 해야 한다.
-	$iSent = ClickMinionButtons(0x541787, "Minion Sent On Mission")
+	Local $iSent = ClickMinionButtons($MINION_SEND_COLOR, $iListTop, "Minion Sent On Mission")
 
 	If $iClaimed > 0 Or $iSent > 0 Then
 		WriteInLogs("Minions Collect")
@@ -456,40 +480,166 @@ Func CollectMinionOneByOne()
 EndFunc   ;==>CollectMinionOneByOne
 
 ; #FUNCTION# ====================================================================================================================
-; 설명 ..........: 미니언 목록에서 지정한 색의 버튼을 위에서부터 하나씩 눌러 준다.
-;                  한 번 누른 버튼 아래에서부터 다시 찾기 때문에 같은 자리를 두 번 누르지 않는다.
-;                  (포인트 부족으로 눌러도 안 바뀌는 버튼이 있어도 무한 반복에 빠지지 않는다)
-; 매개변수 ......: $iColor   - 찾을 버튼 색
-;                  $sLogText - 한 번 누를 때마다 기록에 남길 문구
+; 설명 ..........: 목록 맨 위에 하루 한 번 나오는 [Daily Bonus] 분홍 띠를 받는다.
+;                  누르면 모든 미니언의 남은 임무 시간이 3시간 줄고 그 칸 자체가 사라져서,
+;                  아래 미니언들이 칸 높이만큼 위로 올라온다.
+; 반환값 ........: 미니언 목록이 시작되는 y 좌표
+; ===============================================================================================================================
+Func ClaimMinionDailyBonus()
+	If Not IsMinionDailyBonusVisible() Then Return $MINION_LIST_TOP
+
+	;분홍 띠 클릭
+	MouseClick("left", 328, $MINION_LIST_TOP + 52, 1, 0)
+	;"3 hours forwarded!" 안내가 사라지고 목록이 다시 그려질 때까지 기다린다
+	Sleep(2500)
+
+	If IsMinionDailyBonusVisible() Then
+		; 아직 남아 있으면 목록은 그 칸 아래에서 시작한다
+		Return $MINION_LIST_TOP + $MINION_BONUS_HEIGHT
+	EndIf
+
+	WriteInLogs("Minion Daily Bonus Claimed")
+	Return $MINION_LIST_TOP
+EndFunc   ;==>ClaimMinionDailyBonus
+
+; [Daily Bonus] 칸이 보이는지 확인한다.
+; 분홍 바탕이 물결치듯 계속 바뀌므로(R BF~FF, G 07~34, B 7C 고정) 범위를 넓게 잡는다.
+; 미니언 그림에는 비슷한 색이 있을 수 있어서 글자와 버튼만 있는 오른쪽 절반을 본다.
+Func IsMinionDailyBonusVisible()
+	PixelSearch($MINION_TEXT_X, $MINION_LIST_TOP + 4, 608, $MINION_LIST_TOP + 92, 0xDF1B7C, 40)
+	Return Not @error
+EndFunc   ;==>IsMinionDailyBonusVisible
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 미니언 목록에서 지정한 색의 버튼을 위에서부터 눌러 나간다.
+;                  보이는 화면에서 처리할 버튼을 전부 누른 뒤 스크롤을 한 칸 내리고,
+;                  더 내릴 곳이 없으면 끝낸다.
+;                  한 번 누른 버튼 아래에서부터 다시 찾기 때문에 같은 자리를 거듭 누르지 않는다.
+;                  (슬레이어 포인트가 모자라 눌러도 안 바뀌는 버튼이 있어도 제자리걸음하지 않는다)
+; 매개변수 ......: $iColor    - 찾을 버튼 색
+;                  $iListTop  - 목록이 시작되는 y 좌표
+;                  $sLogText  - 한 번 누를 때마다 기록에 남길 문구
 ; 반환값 ........: 누른 횟수
 ; ===============================================================================================================================
-Func ClickMinionButtons($iColor, $sLogText)
+Func ClickMinionButtons($iColor, $iListTop, $sLogText)
 	Local $aLocation
+	Local $bFound
 	Local $iCount = 0
-	Local $iTop = 115
+	Local $iScrolled = 0
+	Local $iFrom = $iListTop
+
+	ScrollMinionListToTop($iListTop)
 
 	While 1
-		; 버튼 왼쪽 여백(글자가 없는 열)을 세로로 훑어 버튼 위쪽 모서리를 찾는다
-		$aLocation = PixelSearch(420, $iTop, 420, 625, $iColor, 10)
-		If @error Then ExitLoop
+		; 버튼 왼쪽 여백(글자가 없는 열)을 위에서부터 훑어 버튼 위쪽 모서리를 찾는다.
+		; $iFrom 이 아래 끝을 넘어가면 이 화면은 다 본 것이다.
+		; (PixelSearch 는 위아래가 뒤집힌 범위를 알아서 되돌려 잡기 때문에 직접 걸러 줘야 한다)
+		$bFound = False
+		If $iFrom <= $MINION_CLICK_BOTTOM Then
+			$aLocation = PixelSearch($MINION_BTN_X1, $iFrom, $MINION_BTN_X2, $MINION_CLICK_BOTTOM, $iColor, 10)
+			$bFound = Not @error
+		EndIf
 
-		; 찾은 자리 기준으로 버튼 한가운데를 누른다 (버튼 높이 약 122)
-		MouseClick("left", $aLocation[0] + 90, $aLocation[1] + 60, 1, 0)
-		Sleep(500)
+		If Not $bFound Then
+			; 이 화면에는 더 없다 -> 한 칸 내려서 다시 본다
+			If $iScrolled >= 60 Then ExitLoop
+			If Not ScrollMinionListDown($iListTop) Then ExitLoop
+			$iScrolled += 1
+			$iFrom = $iListTop
+			ContinueLoop
+		EndIf
 
-		; 눌러서 실제로 바뀌었는지 확인한다. 포인트가 모자라면 색이 그대로 남는다.
-		PixelSearch(420, $aLocation[1], 420, $aLocation[1], $iColor, 10)
-		If @error Then
+		If ClickMinionButton($aLocation[1], $iColor) Then
 			WriteInLogs($sLogText)
 			$iCount += 1
 		EndIf
 
 		; 처리 여부와 상관없이 다음 미니언부터 찾는다
-		$iTop = $aLocation[1] + 130
+		$iFrom = $aLocation[1] + $MINION_BTN_HEIGHT + 3
 	WEnd
 
 	Return $iCount
 EndFunc   ;==>ClickMinionButtons
+
+; 지정한 자리에 있는 버튼이 찾는 색이면 눌러 준다.
+; 누르고 나서 색이 바뀌었으면 True. 슬레이어 포인트가 모자라면 색이 그대로라 False 가 된다.
+Func ClickMinionButton($iY, $iColor)
+	PixelSearch($MINION_BTN_X1, $iY, $MINION_BTN_X2, $iY + 10, $iColor, 10)
+	If @error Then Return False
+
+	; 찾은 자리는 버튼 위쪽 모서리다. 테두리를 피해 조금 아래, 가운데 쪽을 누른다.
+	; 버튼이 목록 아래쪽에 걸쳐 있으면 누를 자리가 목록 밖으로 나가지 않게 끌어올린다
+	Local $iClickY = $iY + 12
+	If $iClickY > $MINION_LIST_BOTTOM - 4 Then $iClickY = $MINION_LIST_BOTTOM - 4
+	MouseClick("left", $MINION_BTN_X, $iClickY, 1, 0)
+	Sleep(400)
+	; 마우스가 버튼 위에 남아 있으면 색이 달라 보일 수 있으니 글자 쪽으로 비켜 둔다
+	MouseMove($MINION_TEXT_X, $iClickY, 0)
+	Sleep(100)
+
+	PixelSearch($MINION_BTN_X1, $iY, $MINION_BTN_X2, $iY + 10, $iColor, 10)
+	If @error Then Return True
+	Return False
+EndFunc   ;==>ClickMinionButton
+
+; #FUNCTION# ====================================================================================================================
+; 설명 ..........: 스크롤바 손잡이(흰색 막대) 위쪽 끝의 y 좌표.
+;                  마우스를 올려 두면 손잡이가 살짝 흐려지므로(0xFFFFFF -> 0xF5F5F5) 범위를 조금 준다.
+;
+;                  미니언이 적어서 스크롤바가 없으면 그 자리에 미니언 이름이나 보상 숫자 같은
+;                  흰 글자가 올 수 있다. 그래서 먼저 스크롤바 자체가 있는지 확인한 다음에 찾는다.
+;                  목록 맨 위 칸은 스크롤바가 있으면 언제나 회색 테두리다.
+;                    0xA0A0A0  트랙 위쪽 테두리 (손잡이가 내려가 있을 때)
+;                    0xBFBFBF  손잡이 위쪽 테두리 (맨 위까지 올라와 있을 때, 마우스를 올리면 0xB7B7B7)
+; 반환값 ........: 손잡이 위쪽 끝 y. 스크롤바가 없으면 -1
+; ===============================================================================================================================
+Func FindMinionScrollThumb($iListTop)
+	; 0xB0B0B0 에서 16 만큼 = 0xA0~0xC0. 위의 회색 테두리 세 가지가 모두 들어온다
+	PixelSearch($MINION_SCROLL_X, $iListTop, $MINION_SCROLL_X, $iListTop + 5, 0xB0B0B0, 16)
+	If @error Then Return -1
+
+	Local $aPos = PixelSearch($MINION_SCROLL_X, $iListTop, $MINION_SCROLL_X, $MINION_LIST_BOTTOM, 0xFFFFFF, 12)
+	If @error Then Return -1
+	Return $aPos[1]
+EndFunc   ;==>FindMinionScrollThumb
+
+; 미니언 목록을 맨 위로 올린다.
+; 손잡이가 더 이상 안 올라가면 맨 위에 닿은 것이다.
+; 미니언이 적어서 스크롤바가 아예 없으면 손잡이도 없으므로 바로 끝난다.
+Func ScrollMinionListToTop($iListTop)
+	Local $iBefore, $iAfter
+
+	;마우스를 스크롤바 위로 옮긴다
+	MouseMove($MINION_SCROLL_X, $iListTop + 60, 0)
+	For $i = 1 To 40
+		$iBefore = FindMinionScrollThumb($iListTop)
+		If $iBefore = -1 Then ExitLoop
+
+		MouseWheel($MOUSE_WHEEL_UP, 5)
+		Sleep(300)
+
+		$iAfter = FindMinionScrollThumb($iListTop)
+		If $iAfter = -1 Or $iAfter >= $iBefore Then ExitLoop
+	Next
+EndFunc   ;==>ScrollMinionListToTop
+
+; 미니언 목록을 한 칸 내린다. 더 내릴 곳이 없으면 False 를 돌려준다.
+; 한 칸에 약 48px 움직이는데 버튼 높이(67px)보다 작아서 지나쳐 버리는 버튼이 없다.
+Func ScrollMinionListDown($iListTop)
+	Local $iBefore = FindMinionScrollThumb($iListTop)
+	;스크롤바가 없으면 목록이 한 화면에 다 들어온다
+	If $iBefore = -1 Then Return False
+
+	;마우스를 스크롤바 위로 옮긴다
+	MouseMove($MINION_SCROLL_X, $iListTop + 60, 0)
+	MouseWheel($MOUSE_WHEEL_DOWN, 1)
+	Sleep(300)
+
+	;손잡이가 안 내려갔으면 맨 아래까지 온 것이다
+	Local $iAfter = FindMinionScrollThumb($iListTop)
+	If $iAfter = -1 Or $iAfter <= $iBefore Then Return False
+	Return True
+EndFunc   ;==>ScrollMinionListDown
 
 Func CirclePortals()
 	;포탈 버튼이 보이는지 확인
